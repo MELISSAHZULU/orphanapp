@@ -1,0 +1,110 @@
+package com.example.orphanapp.ui
+
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
+import com.example.orphanapp.model.Orphan
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun EnrollmentScreen(navController: NavController, orphanList: MutableList<Orphan>, onEnrollmentSuccess: (Int) -> Unit) {
+    var name by remember { mutableStateOf("") }
+    var age by remember { mutableStateOf("") }
+    var gender by remember { mutableStateOf("") }
+    var birthCertificate by remember { mutableStateOf(false) }
+    var guardianConsent by remember { mutableStateOf(false) }
+    var healthRecord by remember { mutableStateOf(false) }
+    var ageInRange by remember { mutableStateOf(false) }
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Enrollment") },
+                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF4CAF50), titleContentColor = Color.White, navigationIconContentColor = Color.White)
+            )
+        }
+    ) { padding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(padding)
+                .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Select Gender", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.fillMaxWidth())
+            ChecklistItem(label = "Male", checked = gender == "Male", onCheckedChange = { gender = "Male" })
+            ChecklistItem(label = "Female", checked = gender == "Female", onCheckedChange = { gender = "Female" })
+            Spacer(modifier = Modifier.height(16.dp))
+            ChecklistItem(label = "Birth Certificate Provided", checked = birthCertificate, onCheckedChange = { birthCertificate = it })
+            ChecklistItem(label = "Guardian Consent Form Provided", checked = guardianConsent, onCheckedChange = { guardianConsent = it })
+            ChecklistItem(label = "Health Record Available", checked = healthRecord, onCheckedChange = { healthRecord = it })
+            ChecklistItem(label = "Age within 1–18 years", checked = ageInRange, onCheckedChange = { ageInRange = it })
+            Spacer(modifier = Modifier.height(24.dp))
+            Button(
+                onClick = {
+                    val newOrphan = Orphan(
+                        id = orphanList.size + 1,
+                        name = name,
+                        age = age.toIntOrNull() ?: 0,
+                        gender = gender,
+                        birthCertificate = birthCertificate,
+                        status = "Active"
+                    )
+                    orphanList.add(newOrphan)
+                    onEnrollmentSuccess(newOrphan.id)
+                },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
+            ) {
+                Text("Enroll")
+            }
+        }
+    }
+}
+
+@Composable
+fun ChecklistItem(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+        Text(label)
+    }
+}
