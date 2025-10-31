@@ -13,6 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -59,20 +61,32 @@ fun EnrollmentScreen(navController: NavController, orphanList: MutableList<Orpha
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
-            Spacer(modifier = Modifier.height(16.dp))
-            OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
-            Spacer(modifier = Modifier.height(16.dp))
-            Text("Select Gender", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.fillMaxWidth())
-            ChecklistItem(label = "Male", checked = gender == "Male", onCheckedChange = { gender = "Male" })
-            ChecklistItem(label = "Female", checked = gender == "Female", onCheckedChange = { gender = "Female" })
-            Spacer(modifier = Modifier.height(16.dp))
-            ChecklistItem(label = "Birth Certificate Provided", checked = birthCertificate, onCheckedChange = { birthCertificate = it })
-            ChecklistItem(label = "Guardian Consent Form Provided", checked = guardianConsent, onCheckedChange = { guardianConsent = it })
-            ChecklistItem(label = "Health Record Available", checked = healthRecord, onCheckedChange = { healthRecord = it })
-            ChecklistItem(label = "Age within 1–18 years", checked = ageInRange, onCheckedChange = { ageInRange = it })
-            Spacer(modifier = Modifier.height(24.dp))
+            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Orphan Details", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Select Gender", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.fillMaxWidth())
+                    Row {
+                        ChecklistItem(label = "Male", checked = gender == "Male", onCheckedChange = { gender = "Male" })
+                        ChecklistItem(label = "Female", checked = gender == "Female", onCheckedChange = { gender = "Female" })
+                    }
+                }
+            }
+            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text("Documents", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    ChecklistItem(label = "Birth Certificate Provided", checked = birthCertificate, onCheckedChange = { birthCertificate = it })
+                    ChecklistItem(label = "Guardian Consent Form Provided", checked = guardianConsent, onCheckedChange = { guardianConsent = it })
+                    ChecklistItem(label = "Health Record Available", checked = healthRecord, onCheckedChange = { healthRecord = it })
+                    ChecklistItem(label = "Age within 1–18 years", checked = ageInRange, onCheckedChange = { ageInRange = it })
+                }
+            }
+            Spacer(modifier = Modifier.weight(1f))
             Button(
                 onClick = {
                     val newOrphan = Orphan(
@@ -99,7 +113,6 @@ fun EnrollmentScreen(navController: NavController, orphanList: MutableList<Orpha
 fun ChecklistItem(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
-            .fillMaxWidth()
             .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Start

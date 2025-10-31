@@ -25,6 +25,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -34,7 +36,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -51,6 +53,8 @@ import com.example.orphanapp.R
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(navController: NavController) {
+    var showMenu by remember { mutableStateOf(false) }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -60,7 +64,22 @@ fun DashboardScreen(navController: NavController) {
                         Text("Orphan Enrollment and Management System", fontSize = 12.sp)
                     }
                 },
-                actions = { IconButton(onClick = { /* Handle menu click */ }) { Icon(Icons.Filled.Menu, contentDescription = "Menu") } },
+                actions = {
+                    Box {
+                        IconButton(onClick = { showMenu = true }) {
+                            Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                        }
+                        DropdownMenu(
+                            expanded = showMenu,
+                            onDismissRequest = { showMenu = false }
+                        ) {
+                            DropdownMenuItem(text = { Text("Settings") }, onClick = { navController.navigate("settings") })
+                            DropdownMenuItem(text = { Text("Logout") }, onClick = { navController.navigate("login") })
+                            DropdownMenuItem(text = { Text("About") }, onClick = { navController.navigate("about") })
+                            DropdownMenuItem(text = { Text("Help & Support") }, onClick = { navController.navigate("help") })
+                        }
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF4CAF50), titleContentColor = Color.White, actionIconContentColor = Color.White)
             )
         },

@@ -57,7 +57,7 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
                     .padding(16.dp)
             ) {
                 // Basic Info Card
-                Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Name: ${orphan.name}", style = MaterialTheme.typography.bodyLarge)
                         Text("Age: ${orphan.age}", style = MaterialTheme.typography.bodyLarge)
@@ -66,16 +66,19 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
                         Text("Status: $status", style = MaterialTheme.typography.bodyLarge)
                     }
                 }
-                Spacer(modifier = Modifier.height(16.dp))
 
                 // Records Section
-                Column {
-                    RecordItem(label = "Health Records", action = "View/Edit")
-                    RecordItem(label = "Education Progress", action = "View/Edit")
-                    RecordItem(label = "Donations Received", action = "View")
-                    RecordItem(label = "Sponsor Info", action = "View/Edit")
-                    RecordItem(label = "Adoption Requests", action = "View")
-                    RecordItem(label = "Activity Logs", action = "View/Add")
+                Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Records", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        RecordItem(label = "Health Records", action = "View/Edit")
+                        RecordItem(label = "Education Progress", action = "View/Edit")
+                        RecordItem(label = "Donations Received", action = "View")
+                        RecordItem(label = "Sponsor Info", action = "View/Edit")
+                        RecordItem(label = "Adoption Requests", action = "View")
+                        RecordItem(label = "Activity Logs", action = "View/Add")
+                    }
                 }
                 Spacer(modifier = Modifier.weight(1f))
 

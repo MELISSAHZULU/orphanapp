@@ -6,12 +6,16 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.ui.AboutScreen
 import com.example.orphanapp.ui.BottomNavigationBar
 import com.example.orphanapp.ui.ChecklistScreen
 import com.example.orphanapp.ui.DashboardScreen
 import com.example.orphanapp.ui.EnrollmentScreen
-import com.example.orphanapp.ui.TrackingScreen
+import com.example.orphanapp.ui.HelpScreen
+import com.example.orphanapp.ui.LoginScreen
 import com.example.orphanapp.ui.OrphanProfileScreen
+import com.example.orphanapp.ui.SettingsScreen
+import com.example.orphanapp.ui.TrackingScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -27,7 +31,10 @@ fun OrphanageApp() {
     val navController = rememberNavController()
     val orphanList = remember { mutableStateListOf<Orphan>() }
 
-    NavHost(navController = navController, startDestination = "dashboard") {
+    NavHost(navController = navController, startDestination = "login") {
+        composable("login") {
+            LoginScreen(navController)
+        }
         composable("dashboard") {
             DashboardScreen(navController)
         }
@@ -46,6 +53,15 @@ fun OrphanageApp() {
         }
         composable("checklist") {
             ChecklistScreen(navController)
+        }
+        composable("settings") {
+            SettingsScreen(navController)
+        }
+        composable("about") {
+            AboutScreen(navController)
+        }
+        composable("help") {
+            HelpScreen(navController)
         }
     }
 }
