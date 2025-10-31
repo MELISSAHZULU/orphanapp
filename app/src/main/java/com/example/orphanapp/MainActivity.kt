@@ -6,6 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.ui.BottomNavigationBar
 import com.example.orphanapp.ui.ChecklistScreen
 import com.example.orphanapp.ui.DashboardScreen
 import com.example.orphanapp.ui.EnrollmentScreen

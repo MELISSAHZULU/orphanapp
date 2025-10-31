@@ -86,7 +86,7 @@ fun DashboardScreen(navController: NavController) {
                 DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "20")
             }
             Spacer(modifier = Modifier.height(24.dp))
-            Button(onClick = { navController.navigate("enrollment") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
+            Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
                 Text("Register New Orphan")
             }
             Spacer(modifier = Modifier.height(8.dp))
