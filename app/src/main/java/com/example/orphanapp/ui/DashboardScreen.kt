@@ -58,13 +58,8 @@ fun DashboardScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Column {
-                        Text("YOU AND I", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                        Text("Orphan Enrollment and Management System", fontSize = 12.sp)
-                    }
-                },
-                actions = {
+                title = { AppLogo() },
+                navigationIcon = {
                     Box {
                         IconButton(onClick = { showMenu = true }) {
                             Icon(Icons.Filled.Menu, contentDescription = "Menu")
@@ -80,7 +75,7 @@ fun DashboardScreen(navController: NavController) {
                         }
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF4CAF50), titleContentColor = Color.White, actionIconContentColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF4CAF50), titleContentColor = Color.White, navigationIconContentColor = Color.White)
             )
         },
         bottomBar = {
@@ -96,13 +91,13 @@ fun DashboardScreen(navController: NavController) {
             Text("Dashboard", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                DashboardCard(icon = Icons.Filled.People, title = "Total Orphans Registered", value = "2,356")
-                DashboardCard(icon = Icons.Filled.CheckCircle, title = "Verified & Admitted", value = "1,980")
+                DashboardCard(icon = Icons.Filled.People, title = "Total Orphans Registered", value = "2,356", onClick = { navController.navigate("total_orphans") })
+                DashboardCard(icon = Icons.Filled.CheckCircle, title = "Verified & Admitted", value = "1,980", onClick = { navController.navigate("verified_orphans") })
             }
             Spacer(modifier = Modifier.height(16.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                DashboardCard(icon = Icons.Filled.HourglassTop, title = "Pending Verification", value = "150")
-                DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "20")
+                DashboardCard(icon = Icons.Filled.HourglassTop, title = "Pending Verification", value = "150", onClick = { navController.navigate("pending_verification") })
+                DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "20", onClick = { navController.navigate("available_beds") })
             }
             Spacer(modifier = Modifier.height(24.dp))
             Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
@@ -121,11 +116,12 @@ fun DashboardScreen(navController: NavController) {
 }
 
 @Composable
-fun DashboardCard(icon: ImageVector, title: String, value: String) {
+fun DashboardCard(icon: ImageVector, title: String, value: String, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .size(150.dp)
-            .padding(8.dp),
+            .padding(8.dp)
+            .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
