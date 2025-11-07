@@ -18,7 +18,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.style.TextAlign
@@ -42,8 +41,8 @@ fun LoginScreen(navController: NavController) {
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        MaterialTheme.colorScheme.primaryContainer,
-                        MaterialTheme.colorScheme.secondaryContainer
+                        MaterialTheme.colorScheme.primary,
+                        MaterialTheme.colorScheme.secondary
                     )
                 )
             )
@@ -116,7 +115,7 @@ fun LoginScreen(navController: NavController) {
                         Text("Login", modifier = Modifier.padding(8.dp))
                     }
                     TextButton(onClick = { /* Handle Forgot Password */ }) {
-                        Text("Forgot Password?", color = MaterialTheme.colorScheme.primary)
+                        Text("Forgot Password?", color = MaterialTheme.colorScheme.secondary)
                     }
                 }
             }
@@ -125,7 +124,7 @@ fun LoginScreen(navController: NavController) {
                 text = "New user? Contact your administrator to create an account.",
                 textAlign = TextAlign.Center,
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onPrimary
             )
         }
     }

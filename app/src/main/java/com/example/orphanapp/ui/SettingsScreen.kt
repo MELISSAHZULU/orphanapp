@@ -25,7 +25,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -41,9 +40,9 @@ fun SettingsScreen(navController: NavController, isDarkMode: MutableState<Boolea
                 title = { Text("Settings") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF4CAF50),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -61,7 +60,7 @@ fun SettingsScreen(navController: NavController, isDarkMode: MutableState<Boolea
                     SettingItem(label = "Enable Notifications", checked = notificationsEnabled, onCheckedChange = { notificationsEnabled = it })
                     SettingItem(label = "Dark Mode", checked = isDarkMode.value, onCheckedChange = { isDarkMode.value = it })
                     TextButton(onClick = { /* Handle Privacy Policy */ }) {
-                        Text("Privacy Policy", color = Color(0xFF4CAF50))
+                        Text("Privacy Policy", color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
