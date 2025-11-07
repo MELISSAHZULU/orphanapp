@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,7 +25,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -42,7 +40,11 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
             TopAppBar(
                 title = { Text("Orphan Profile: ${orphan?.name ?: ""}") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF4CAF50), titleContentColor = Color.White, navigationIconContentColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         },
         bottomBar = {
@@ -87,11 +89,11 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
                     Button(onClick = {
                         orphan.status = "Updated"
                         status = "Updated"
-                    }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
+                    }) {
                         Text("Update Status")
                     }
                     OutlinedButton(onClick = { navController.navigate("tracking") }) {
-                        Text("Back to List", color = Color(0xFF4CAF50))
+                        Text("Back to List", color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
@@ -108,6 +110,6 @@ fun RecordItem(label: String, action: String) {
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         Text(label, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.weight(1f))
-        Text("[$action]", color = Color.Gray)
+        Text("[$action]", color = MaterialTheme.colorScheme.secondary)
     }
 }

@@ -13,7 +13,6 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,7 +25,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.orphanapp.model.Orphan
@@ -40,7 +38,10 @@ fun TrackingScreen(orphanList: List<Orphan>, navController: NavController) {
         topBar = {
             TopAppBar(
                 title = { Text("Orphan Tracking System") },
-                colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF4CAF50), titleContentColor = Color.White)
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         },
         bottomBar = {
@@ -62,7 +63,7 @@ fun TrackingScreen(orphanList: List<Orphan>, navController: NavController) {
                     shape = RoundedCornerShape(24.dp)
                 )
                 Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { /* Handle Search */ }, colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
+                Button(onClick = { /* Handle Search */ }) {
                     Text("Search")
                 }
             }
