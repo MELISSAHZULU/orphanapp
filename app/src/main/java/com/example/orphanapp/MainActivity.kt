@@ -3,9 +3,6 @@ package com.example.orphanapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.darkColorScheme
-import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.orphanapp.model.Orphan
@@ -24,15 +21,14 @@ import com.example.orphanapp.ui.SettingsScreen
 import com.example.orphanapp.ui.TotalOrphansScreen
 import com.example.orphanapp.ui.TrackingScreen
 import com.example.orphanapp.ui.VerifiedOrphansScreen
+import com.example.orphanapp.ui.theme.OrphanAppTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val isDarkMode = remember { mutableStateOf(false) }
-            MaterialTheme(
-                colorScheme = if (isDarkMode.value) darkColorScheme() else lightColorScheme()
-            ) {
+            OrphanAppTheme(darkTheme = isDarkMode.value) {
                 OrphanageApp(isDarkMode)
             }
         }

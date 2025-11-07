@@ -168,7 +168,7 @@ fun ChecklistScreen(navController: NavController) {
             item { Spacer(modifier = Modifier.height(16.dp)) }
             item {
                 Button(
-                    onClick = { navController.navigate("dashboard") },
+                    onClick = { navController.navigate("enrollment") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
                 ) {
