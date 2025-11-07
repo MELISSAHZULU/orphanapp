@@ -58,11 +58,11 @@ fun DashboardScreen(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { AppLogo() },
+                title = { Text("YOU AND I", fontWeight = FontWeight.Bold) },
                 navigationIcon = {
                     Box {
                         IconButton(onClick = { showMenu = true }) {
-                            Icon(Icons.Filled.Menu, contentDescription = "Menu")
+                            Icon(Icons.Filled.Menu, contentDescription = "Menu", modifier = Modifier.size(40.dp))
                         }
                         DropdownMenu(
                             expanded = showMenu,
@@ -104,7 +104,7 @@ fun DashboardScreen(navController: NavController) {
                 Text("Register New Orphan")
             }
             Spacer(modifier = Modifier.height(8.dp))
-            OutlinedButton(onClick = { /* Handle Generate Report */ }, modifier = Modifier.fillMaxWidth()) {
+            OutlinedButton(onClick = { navController.navigate("report") }, modifier = Modifier.fillMaxWidth()) {
                 Text("Generate Report", color = Color(0xFF4CAF50))
             }
             Spacer(modifier = Modifier.height(24.dp))

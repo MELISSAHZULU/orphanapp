@@ -19,6 +19,7 @@ import com.example.orphanapp.ui.HelpScreen
 import com.example.orphanapp.ui.LoginScreen
 import com.example.orphanapp.ui.OrphanProfileScreen
 import com.example.orphanapp.ui.PendingVerificationScreen
+import com.example.orphanapp.ui.ReportScreen
 import com.example.orphanapp.ui.SettingsScreen
 import com.example.orphanapp.ui.TotalOrphansScreen
 import com.example.orphanapp.ui.TrackingScreen
@@ -86,6 +87,9 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
         }
         composable("available_beds") {
             AvailableBedsScreen(navController)
+        }
+        composable("report") {
+            ReportScreen(navController, orphanList)
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.example.orphanapp.ui
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -7,13 +9,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AddAPhoto
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
@@ -33,29 +41,46 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ChecklistScreen(navController: NavController) {
-    var applicantName by remember { mutableStateOf("") }
-    var inquirerName by remember { mutableStateOf("") }
-    var presentAddress by remember { mutableStateOf("") }
+    var childName by remember { mutableStateOf("") }
+    var dob by remember { mutableStateOf("") }
+    var placeOfBirth by remember { mutableStateOf("") }
     var village by remember { mutableStateOf("") }
-    var postOffice by remember { mutableStateOf("") }
-    var policeStation by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
-    var gender by remember { mutableStateOf("") }
-    var fatherName by remember { mutableStateOf("") }
-    var motherName by remember { mutableStateOf("") }
-    var guardianName by remember { mutableStateOf("") }
-    var guardianRelationship by remember { mutableStateOf("") }
-    var guardianOccupation by remember { mutableStateOf("") }
-    var witnessName by remember { mutableStateOf("") }
-    var villageHeadName by remember { mutableStateOf("") }
-    var villageHeadAddress by remember { mutableStateOf("") }
-    var place by remember { mutableStateOf("") }
-    var date by remember { mutableStateOf("") }
+    var ta by remember { mutableStateOf("") }
+    var district by remember { mutableStateOf("") }
+    var guardian1 by remember { mutableStateOf("") }
+    var relationship1 by remember { mutableStateOf("") }
+    var guardian2 by remember { mutableStateOf("") }
+    var relationship2 by remember { mutableStateOf("") }
+    var orphanStatus by remember { mutableStateOf("") }
+    var motherDeath by remember { mutableStateOf("") }
+    var fatherDeath by remember { mutableStateOf("") }
+    var siblings by remember { mutableStateOf("") }
+    var health by remember { mutableStateOf("") }
+    var medicalConditions by remember { mutableStateOf("") }
+    var disabilities by remember { mutableStateOf("") }
+    var circumstances by remember { mutableStateOf("") }
+    var religiousAffiliation by remember { mutableStateOf("") }
+    var churchOrMosque by remember { mutableStateOf("") }
+    var isBornAgain by remember { mutableStateOf(false) }
+    var bornAgainDate by remember { mutableStateOf("") }
+    var testimony by remember { mutableStateOf("") }
+    var schoolName by remember { mutableStateOf("") }
+    var stdForm by remember { mutableStateOf("") }
+    var favoriteSubject by remember { mutableStateOf("") }
+    var favoriteColor by remember { mutableStateOf("") }
+    var favoriteFood by remember { mutableStateOf("") }
+    var favoriteActivity by remember { mutableStateOf("") }
+    var futureDreams by remember { mutableStateOf("") }
+    var recommendation by remember { mutableStateOf(false) }
+    var program by remember { mutableStateOf("") }
+    var reason by remember { mutableStateOf("") }
+    var staffName by remember { mutableStateOf("") }
+    var signatureDate by remember { mutableStateOf("") }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Checklist") },
+                title = { Text("Child Intake Form") },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = Color(0xFF4CAF50),
                     titleContentColor = Color.White
@@ -72,62 +97,78 @@ fun ChecklistScreen(navController: NavController) {
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Applicant Information", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        ChecklistTextField(label = "Name of Applicant", value = applicantName, onValueChange = { applicantName = it })
-                        ChecklistTextField(label = "Name of the Person Who Inquired", value = inquirerName, onValueChange = { inquirerName = it })
-                        ChecklistTextField(label = "Present Address", value = presentAddress, onValueChange = { presentAddress = it })
-                        ChecklistTextField(label = "Village", value = village, onValueChange = { village = it })
-                        ChecklistTextField(label = "Post Office", value = postOffice, onValueChange = { postOffice = it })
-                        ChecklistTextField(label = "Police Station", value = policeStation, onValueChange = { policeStation = it })
-                        ChecklistTextField(label = "Age", value = age, onValueChange = { age = it })
-                        Text("Gender")
-                        Row {
-                            RadioButton(selected = gender == "Male", onClick = { gender = "Male" })
-                            Text("Male", modifier = Modifier.padding(end = 16.dp))
-                            RadioButton(selected = gender == "Female", onClick = { gender = "Female" })
-                            Text("Female")
-                        }
+            item { SectionTitle("CHILD HISTORY") }
+            item { ChecklistTextField(label = "Name of Child", value = childName, onValueChange = { childName = it }) }
+            item { Row {
+                ChecklistTextField(label = "Date of Birth: DD/MM/YYYY", value = dob, onValueChange = { dob = it }, modifier = Modifier.weight(1f))
+                ChecklistTextField(label = "Place of Birth", value = placeOfBirth, onValueChange = { placeOfBirth = it }, modifier = Modifier.weight(1f))
+            } }
+            item { Row {
+                ChecklistTextField(label = "Village and T/A", value = village, onValueChange = { village = it }, modifier = Modifier.weight(1f))
+                ChecklistTextField(label = "District", value = district, onValueChange = { district = it }, modifier = Modifier.weight(1f))
+            } }
+            item { Row {
+                ChecklistTextField(label = "Guardian", value = guardian1, onValueChange = { guardian1 = it }, modifier = Modifier.weight(1f))
+                ChecklistTextField(label = "Relationship", value = relationship1, onValueChange = { relationship1 = it }, modifier = Modifier.weight(1f))
+            } }
+            item { Row {
+                ChecklistTextField(label = "Guardian", value = guardian2, onValueChange = { guardian2 = it }, modifier = Modifier.weight(1f))
+                ChecklistTextField(label = "Relationship", value = relationship2, onValueChange = { relationship2 = it }, modifier = Modifier.weight(1f))
+            } }
+            item { SectionTitle("Family") }
+            item { ChecklistTextField(label = "Orphan Status", value = orphanStatus, onValueChange = { orphanStatus = it }) }
+            item { ChecklistTextField(label = "Mother: (year and cause of death, if known)", value = motherDeath, onValueChange = { motherDeath = it }) }
+            item { ChecklistTextField(label = "Father: (year and cause of death, if known)", value = fatherDeath, onValueChange = { fatherDeath = it }) }
+            item { ChecklistTextField(label = "Siblings/relatives at Passion (full name and relationship)", value = siblings, onValueChange = { siblings = it }) }
+            item { SectionTitle("Health") }
+            item { ChecklistTextField(label = "Major, on-going illnesses (e.g. HIV, TB, diabetes, etc.)", value = health, onValueChange = { health = it }) }
+            item { ChecklistTextField(label = "Other medical conditions (e.g. hearing/vision loss, malnourishment, etc.)", value = medicalConditions, onValueChange = { medicalConditions = it }) }
+            item { ChecklistTextField(label = "Other disabilities (e.g. hearing/vision loss, malnourishment, etc.)", value = disabilities, onValueChange = { disabilities = it }) }
+            item { PhotoAttachment() }
+            item { ChecklistTextField(label = "Summary of Circumstances (Story)", value = circumstances, onValueChange = { circumstances = it }, singleLine = false, minLines = 5) }
+            item { SectionTitle("Spiritual Background") }
+            item { ChecklistTextField(label = "Religious Affiliation", value = religiousAffiliation, onValueChange = { religiousAffiliation = it }) }
+            item { ChecklistTextField(label = "Church or Mosque", value = churchOrMosque, onValueChange = { churchOrMosque = it }) }
+            item { Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("If Christian, do they profess to be born again?")
+                Checkbox(checked = isBornAgain, onCheckedChange = { isBornAgain = it })
+                ChecklistTextField(label = "Date", value = bornAgainDate, onValueChange = { bornAgainDate = it })
+            } }
+            item { ChecklistTextField(label = "Child’s Testimony (How they came to Christ)", value = testimony, onValueChange = { testimony = it }, singleLine = false, minLines = 3) }
+            item { SectionTitle("STUDENT PROFILE") }
+            item { Row {
+                ChecklistTextField(label = "Name of School", value = schoolName, onValueChange = { schoolName = it }, modifier = Modifier.weight(1f))
+                ChecklistTextField(label = "Std/Form", value = stdForm, onValueChange = { stdForm = it }, modifier = Modifier.weight(1f))
+            } }
+            item { ChecklistTextField(label = "What is their favorite subject in school?", value = favoriteSubject, onValueChange = { favoriteSubject = it }) }
+            item { ChecklistTextField(label = "What is their favorite color?", value = favoriteColor, onValueChange = { favoriteColor = it }) }
+            item { ChecklistTextField(label = "What is their favorite food?", value = favoriteFood, onValueChange = { favoriteFood = it }) }
+            item { ChecklistTextField(label = "What is their favorite activity?", value = favoriteActivity, onValueChange = { favoriteActivity = it }) }
+            item { ChecklistTextField(label = "What dreams do they have for the future?", value = futureDreams, onValueChange = { futureDreams = it }) }
+            item { SectionTitle("RECOMMENDATIONS") }
+            item { Row(verticalAlignment = Alignment.CenterVertically) {
+                Text("Do you recommend this child be in the Passion Center program?")
+                Checkbox(checked = recommendation, onCheckedChange = { recommendation = it })
+            } }
+            item { Text("If yes, tick the appropriate Program:") }
+            item { Column {
+                val programs = listOf("Residency", "Village-Mulunguzi", "Village – Jali", "Child-headed Household (CHH)", "Infant Rescue Home", "Champions Club")
+                programs.forEach { programOption ->
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(selected = program == programOption, onClick = { program = programOption })
+                        Text(programOption)
                     }
                 }
-            }
+            } }
+            item { ChecklistTextField(label = "Explain why this child should be admitted to the Passion Center program:", value = reason, onValueChange = { reason = it }, singleLine = false, minLines = 4) }
+            item { Row {
+                ChecklistTextField(label = "Name of Staff", value = staffName, onValueChange = { staffName = it }, modifier = Modifier.weight(1f))
+                ChecklistTextField(label = "Date", value = signatureDate, onValueChange = { signatureDate = it }, modifier = Modifier.weight(1f))
+            } }
+            item { Spacer(modifier = Modifier.height(16.dp)) }
             item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Family Information", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        ChecklistTextField(label = "Father's Name", value = fatherName, onValueChange = { fatherName = it })
-                        ChecklistFileItem(label = "Father's Death Certificate (Medical)")
-                        ChecklistTextField(label = "Mother's Name", value = motherName, onValueChange = { motherName = it })
-                        ChecklistFileItem(label = "Mother's Death Certificate (Medical)")
-                        ChecklistTextField(label = "Name of Guardian", value = guardianName, onValueChange = { guardianName = it })
-                        ChecklistTextField(label = "Relationship with Guardian", value = guardianRelationship, onValueChange = { guardianRelationship = it })
-                        ChecklistTextField(label = "Occupation of Guardian", value = guardianOccupation, onValueChange = { guardianOccupation = it })
-                    }
-                }
-            }
-            item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Verification", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        ChecklistFileItem(label = "Police Verification Report")
-                        ChecklistTextField(label = "Name of Witness", value = witnessName, onValueChange = { witnessName = it })
-                        ChecklistTextField(label = "Name of Village Head", value = villageHeadName, onValueChange = { villageHeadName = it })
-                        ChecklistTextField(label = "Village Head Address", value = villageHeadAddress, onValueChange = { villageHeadAddress = it })
-                        Spacer(modifier = Modifier.height(16.dp))
-                        ChecklistTextField(label = "Place", value = place, onValueChange = { place = it })
-                        ChecklistTextField(label = "Date", value = date, onValueChange = { date = it })
-                    }
-                }
-            }
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
                 Button(
-                    onClick = { navController.navigate("enrollment") },
+                    onClick = { navController.navigate("dashboard") },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))
                 ) {
@@ -139,30 +180,53 @@ fun ChecklistScreen(navController: NavController) {
 }
 
 @Composable
-fun ChecklistTextField(label: String, value: String, onValueChange: (String) -> Unit) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        label = { Text(label) },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        shape = RoundedCornerShape(24.dp)
+fun SectionTitle(title: String) {
+    Text(
+        text = title,
+        style = MaterialTheme.typography.titleMedium,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
     )
 }
 
 @Composable
-fun ChecklistFileItem(label: String) {
-    Row(
+fun ChecklistTextField(label: String, value: String, onValueChange: (String) -> Unit, modifier: Modifier = Modifier, singleLine: Boolean = true, minLines: Int = 1) {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        label = { Text(label) },
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        singleLine = singleLine,
+        minLines = minLines
+    )
+}
+
+@Composable
+fun PhotoAttachment() {
+    Card(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        shape = RoundedCornerShape(16.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
-        Text(label)
-        Spacer(modifier = Modifier.weight(1f))
-        OutlinedButton(onClick = { /* Handle file attachment */ }) {
-            Text("Attach File")
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(150.dp)
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text("Insert Child’s Photo here")
+                Spacer(modifier = Modifier.height(8.dp))
+                IconButton(onClick = { /* Handle photo attachment */ }) {
+                    Icon(Icons.Default.AddAPhoto, contentDescription = "Add Photo", modifier = Modifier.size(48.dp))
+                }
+            }
         }
     }
 }
