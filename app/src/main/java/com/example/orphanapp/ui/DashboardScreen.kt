@@ -22,7 +22,6 @@ import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DrawerValue
@@ -97,7 +96,7 @@ fun DashboardScreen(navController: NavController) {
                             Icon(Icons.Filled.Menu, contentDescription = "Menu", modifier = Modifier.size(40.dp))
                         }
                     },
-                    colors = TopAppBarDefaults.topAppBarColors(containerColor = Color(0xFF4CAF50), titleContentColor = Color.White, navigationIconContentColor = Color.White)
+                    colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.primary, titleContentColor = MaterialTheme.colorScheme.onPrimary, navigationIconContentColor = MaterialTheme.colorScheme.onPrimary)
                 )
             },
             bottomBar = {
@@ -122,12 +121,12 @@ fun DashboardScreen(navController: NavController) {
                     DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "20", onClick = { navController.navigate("available_beds") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth(), colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50))) {
+                Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth()) {
                     Text("Register New Orphan")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
                 OutlinedButton(onClick = { navController.navigate("report") }, modifier = Modifier.fillMaxWidth()) {
-                    Text("Generate Report", color = Color(0xFF4CAF50))
+                    Text("Generate Report", color = MaterialTheme.colorScheme.primary)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Text("Recent Admissions", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
@@ -152,7 +151,7 @@ fun DashboardCard(icon: ImageVector, title: String, value: String, onClick: () -
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(icon, contentDescription = title, tint = Color(0xFF4CAF50))
+            Icon(icon, contentDescription = title, tint = MaterialTheme.colorScheme.primary)
             Text(text = title, textAlign = TextAlign.Center, fontSize = 14.sp)
             Text(text = value, fontWeight = FontWeight.Bold, fontSize = 24.sp)
         }
@@ -176,10 +175,10 @@ fun RecentAdmissionItem(navController: NavController, id: Int, name: String, age
                     Spacer(modifier = Modifier.weight(1f))
                     Box(
                         modifier = Modifier
-                            .background(Color(0xFF4CAF50), RoundedCornerShape(50))
+                            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
                             .padding(horizontal = 8.dp, vertical = 4.dp)
                     ) {
-                        Text("Admitted", color = Color.White, fontSize = 12.sp)
+                        Text("Admitted", color = MaterialTheme.colorScheme.onPrimary, fontSize = 12.sp)
                     }
                 }
                 Text("Age $age", fontSize = 14.sp)

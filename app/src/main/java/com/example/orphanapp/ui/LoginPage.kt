@@ -42,8 +42,8 @@ fun LoginScreen(navController: NavController) {
             .background(
                 brush = Brush.verticalGradient(
                     colors = listOf(
-                        Color(0xFFE8F5E9),
-                        Color(0xFFA5D6A7)
+                        MaterialTheme.colorScheme.primaryContainer,
+                        MaterialTheme.colorScheme.secondaryContainer
                     )
                 )
             )
@@ -111,13 +111,12 @@ fun LoginScreen(navController: NavController) {
                     Button(
                         onClick = { navController.navigate("dashboard") },
                         modifier = Modifier.fillMaxWidth(),
-                        colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF4CAF50)),
                         shape = RoundedCornerShape(24.dp)
                     ) {
                         Text("Login", modifier = Modifier.padding(8.dp))
                     }
                     TextButton(onClick = { /* Handle Forgot Password */ }) {
-                        Text("Forgot Password?", color = Color(0xFF4CAF50))
+                        Text("Forgot Password?", color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }

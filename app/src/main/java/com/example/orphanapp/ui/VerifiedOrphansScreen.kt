@@ -23,7 +23,6 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -38,9 +37,9 @@ fun VerifiedOrphansScreen(navController: NavController, orphanList: List<Orphan>
                 title = { Text("Verified & Admitted Orphans") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF4CAF50),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -76,7 +75,7 @@ fun VerifiedOrphansScreen(navController: NavController, orphanList: List<Orphan>
                                 Text("Gender: ${orphan.gender}")
                             }
                             Spacer(modifier = Modifier.weight(1f))
-                            Text(orphan.status, color = Color(0xFF4CAF50))
+                            Text(orphan.status, color = MaterialTheme.colorScheme.primary)
                         }
                     }
                 }

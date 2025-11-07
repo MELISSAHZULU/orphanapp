@@ -38,9 +38,9 @@ fun TotalOrphansScreen(navController: NavController, orphanList: List<Orphan>) {
                 title = { Text("Total Orphans") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = Color(0xFF4CAF50),
-                    titleContentColor = Color.White,
-                    navigationIconContentColor = Color.White
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
         }
@@ -76,7 +76,7 @@ fun TotalOrphansScreen(navController: NavController, orphanList: List<Orphan>) {
                                 Text("Gender: ${orphan.gender}")
                             }
                             Spacer(modifier = Modifier.weight(1f))
-                            Text(orphan.status, color = if (orphan.status == "Active") Color(0xFF4CAF50) else Color.Gray)
+                            Text(orphan.status, color = if (orphan.status == "Active") MaterialTheme.colorScheme.primary else Color.Gray)
                         }
                     }
                 }
