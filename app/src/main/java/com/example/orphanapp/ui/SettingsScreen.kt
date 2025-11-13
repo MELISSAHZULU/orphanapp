@@ -31,7 +31,7 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(navController: NavController, isDarkMode: MutableState<Boolean>) {
+fun SettingsScreen(navController: NavController) {
     var notificationsEnabled by remember { mutableStateOf(true) }
 
     Scaffold(
@@ -58,7 +58,6 @@ fun SettingsScreen(navController: NavController, isDarkMode: MutableState<Boolea
                     Text("General", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     SettingItem(label = "Enable Notifications", checked = notificationsEnabled, onCheckedChange = { notificationsEnabled = it })
-                    SettingItem(label = "Dark Mode", checked = isDarkMode.value, onCheckedChange = { isDarkMode.value = it })
                     TextButton(onClick = { /* Handle Privacy Policy */ }) {
                         Text("Privacy Policy", color = MaterialTheme.colorScheme.primary)
                     }

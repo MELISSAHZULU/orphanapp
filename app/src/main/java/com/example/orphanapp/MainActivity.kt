@@ -7,7 +7,6 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,9 +47,8 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
-            val isDarkMode = remember { mutableStateOf(false) }
-            OrphanAppTheme(darkTheme = isDarkMode.value) {
-                OrphanageApp(isDarkMode, authViewModel, enrollmentViewModel)
+            OrphanAppTheme {
+                OrphanageApp(authViewModel, enrollmentViewModel)
             }
         }
     }
@@ -58,7 +56,6 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun OrphanageApp(
-    isDarkMode: MutableState<Boolean>,
     authViewModel: AuthViewModel,
     enrollmentViewModel: EnrollmentViewModel
 ) {
@@ -97,7 +94,7 @@ fun OrphanageApp(
                     ChecklistScreen(navController)
                 }
                 composable("settings") {
-                    SettingsScreen(navController, isDarkMode)
+                    SettingsScreen(navController)
                 }
                 composable("about") {
                     AboutScreen(navController)
@@ -151,7 +148,6 @@ fun OrphanageApp(
                 composable("register") {
                     RegisterScreen(navController, authViewModel)
                 }
-                 // Other routes are not accessible when unauthenticated
             }
         }
     }

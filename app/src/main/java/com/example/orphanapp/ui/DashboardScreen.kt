@@ -19,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Button
@@ -157,8 +158,8 @@ fun AppDrawer(
     val scrollState = rememberScrollState()
     val authState by authViewModel.authState.collectAsState()
     val user = (authState as? AuthState.Authenticated)?.user
-    val drawerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primary
-    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onPrimary
+    val drawerColor = MaterialTheme.colorScheme.primary
+    val textColor = MaterialTheme.colorScheme.onPrimary
 
     ModalDrawerSheet(
         drawerContainerColor = drawerColor
@@ -205,7 +206,7 @@ fun AppDrawer(
 
 @Composable
 fun DrawerItem(icon: ImageVector, text: String, onClick: () -> Unit) {
-    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.White
+    val textColor = MaterialTheme.colorScheme.onPrimary
     NavigationDrawerItem(
         icon = { Icon(icon, contentDescription = text, tint = textColor) },
         label = { Text(text, color = textColor) },
