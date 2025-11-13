@@ -18,21 +18,32 @@ import androidx.navigation.compose.rememberNavController
 import com.example.orphanapp.ui.theme.OrphanAppTheme
 
 @Composable
-fun InventoryScreen(navController: NavController) {
+fun CommunicationScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
     ) {
-        Text("Inventory & Resource Management", style = MaterialTheme.typography.headlineSmall)
+        Text("Communication", style = MaterialTheme.typography.headlineSmall)
         Spacer(modifier = Modifier.height(16.dp))
 
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Categorized Listings", style = MaterialTheme.typography.titleMedium)
+                Text("Secure Messaging", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                // TODO: Implement inventory list
-                Text("Categorized listings of items will be here.")
+                // TODO: Implement secure messaging
+                Text("In-app communication channels for staff and potentially donors will be here.")
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Card(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text("Announcement Board", style = MaterialTheme.typography.titleMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                // TODO: Implement announcement board
+                Text("A clear display of important updates will be here.")
             }
         }
     }
@@ -40,8 +51,8 @@ fun InventoryScreen(navController: NavController) {
 
 @Preview(showBackground = true)
 @Composable
-fun InventoryScreenPreview() {
+fun CommunicationScreenPreview() {
     OrphanAppTheme {
-        InventoryScreen(rememberNavController())
+        CommunicationScreen(rememberNavController())
     }
 }

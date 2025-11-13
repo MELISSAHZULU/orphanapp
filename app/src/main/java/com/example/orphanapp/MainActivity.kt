@@ -16,12 +16,14 @@ import com.example.orphanapp.ui.DonationScreen
 import com.example.orphanapp.ui.EnrollmentScreen
 import com.example.orphanapp.ui.HelpScreen
 import com.example.orphanapp.ui.ImpactReportingScreen
+import com.example.orphanapp.ui.InventoryScreen
 import com.example.orphanapp.ui.LoginScreen
 import com.example.orphanapp.ui.OrphanProfileScreen
 import com.example.orphanapp.ui.PendingVerificationScreen
 import com.example.orphanapp.ui.PhotoGalleryScreen
 import com.example.orphanapp.ui.ReportScreen
 import com.example.orphanapp.ui.SettingsScreen
+import com.example.orphanapp.ui.StaffManagementScreen
 import com.example.orphanapp.ui.TotalOrphansScreen
 import com.example.orphanapp.ui.TrackingScreen
 import com.example.orphanapp.ui.VerifiedOrphansScreen
@@ -102,6 +104,12 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
         }
         composable("impact_reporting") {
             ImpactReportingScreen(navController)
+        }
+        composable("inventory") {
+            InventoryScreen(navController)
+        }
+        composable("staff_management") {
+            StaffManagementScreen(navController)
         }
     }
 }

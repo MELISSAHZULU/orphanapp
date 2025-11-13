@@ -24,9 +24,11 @@ import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.HourglassTop
+import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.SupervisorAccount
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -140,6 +142,11 @@ fun DashboardScreen(navController: NavController) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.Favorite, title = "Donations", value = "", onClick = { navController.navigate("donation") })
                     DashboardCard(icon = Icons.Filled.BarChart, title = "Impact Reporting", value = "", onClick = { navController.navigate("impact_reporting") })
+                }
+                 Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+                    DashboardCard(icon = Icons.Filled.Inventory, title = "Inventory", value = "", onClick = { navController.navigate("inventory") })
+                    DashboardCard(icon = Icons.Filled.SupervisorAccount, title = "Staff Management", value = "", onClick = { navController.navigate("staff_management") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth()) {
