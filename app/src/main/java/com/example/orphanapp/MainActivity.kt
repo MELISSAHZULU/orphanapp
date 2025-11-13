@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.repository.OrphanRepositoryImpl
 import com.example.orphanapp.ui.AboutScreen
 import com.example.orphanapp.ui.ActivityLogScreen
 import com.example.orphanapp.ui.AvailableBedsScreen
@@ -31,6 +32,7 @@ import com.example.orphanapp.ui.TrackingScreen
 import com.example.orphanapp.ui.VerifiedOrphansScreen
 import com.example.orphanapp.ui.theme.OrphanAppTheme
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
+import com.example.orphanapp.viewmodel.EnrollmentViewModelFactory
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +49,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
     val navController = rememberNavController()
-    val enrollmentViewModel: EnrollmentViewModel = viewModel()
+    val orphanRepository = remember { OrphanRepositoryImpl() }
+    val enrollmentViewModel: EnrollmentViewModel = viewModel(factory = EnrollmentViewModelFactory(orphanRepository))
     val orphanList by enrollmentViewModel.orphans.collectAsState()
 
     NavHost(navController = navController, startDestination = "login") {
@@ -68,7 +71,9 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
         composable("profile/{id}") { backStackEntry ->
             val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
             val orphan = orphanList.find { it.id == id }
-            OrphanProfileScreen(navController, orphan)
+            OrphanProfileScreen(navController, orphan) { updatedOrphan ->
+                enrollmentViewModel.updateOrphan(updatedOrphan)
+            }
         }
         composable("checklist") {
             ChecklistScreen(navController)

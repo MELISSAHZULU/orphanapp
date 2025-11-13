@@ -34,7 +34,7 @@ import com.example.orphanapp.model.Orphan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
+fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate: (Orphan) -> Unit) {
     var isEditing by remember { mutableStateOf(false) }
     var name by remember { mutableStateOf(orphan?.name ?: "") }
     var age by remember { mutableStateOf(orphan?.age?.toString() ?: "") }
@@ -106,18 +106,21 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     if (isEditing) {
                         Button(onClick = {
-                            orphan.name = name
-                            orphan.age = age.toIntOrNull() ?: orphan.age
-                            orphan.gender = gender
-                            orphan.status = status
+                            val updatedOrphan = orphan.copy(
+                                name = name,
+                                age = age.toIntOrNull() ?: orphan.age,
+                                gender = gender,
+                                status = status
+                            )
+                            onUpdate(updatedOrphan)
                             isEditing = false
                         }) {
                             Text("Save")
                         }
                     } else {
                         Button(onClick = {
-                            orphan.status = "Updated"
-                            status = "Updated"
+                            val updatedOrphan = orphan.copy(status = "Updated")
+                            onUpdate(updatedOrphan)
                         }) {
                             Text("Update Status")
                         }
