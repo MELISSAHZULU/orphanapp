@@ -13,14 +13,18 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.People
+import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -106,11 +110,13 @@ fun DashboardScreen(navController: NavController) {
                 BottomNavigationBar(navController, "dashboard")
             }
         ) { padding ->
+            val scrollState = rememberScrollState()
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding)
                     .padding(16.dp)
+                    .verticalScroll(scrollState)
             ) {
                 Text("Dashboard", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -122,6 +128,11 @@ fun DashboardScreen(navController: NavController) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.HourglassTop, title = "Pending Verification", value = "150", onClick = { navController.navigate("pending_verification") })
                     DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "20", onClick = { navController.navigate("available_beds") })
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
+                    DashboardCard(icon = Icons.Filled.PhotoLibrary, title = "Photo Gallery", value = "", onClick = { navController.navigate("photo_gallery") })
+                    DashboardCard(icon = Icons.Filled.Assignment, title = "Activity Log", value = "", onClick = { navController.navigate("activity_log") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth()) {

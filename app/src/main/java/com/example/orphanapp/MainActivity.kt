@@ -7,15 +7,18 @@ import androidx.compose.runtime.*
 import androidx.navigation.compose.*
 import com.example.orphanapp.model.Orphan
 import com.example.orphanapp.ui.AboutScreen
+import com.example.orphanapp.ui.ActivityLogScreen
 import com.example.orphanapp.ui.AvailableBedsScreen
 import com.example.orphanapp.ui.BottomNavigationBar
 import com.example.orphanapp.ui.ChecklistScreen
 import com.example.orphanapp.ui.DashboardScreen
+import com.example.orphanapp.ui.DonationScreen
 import com.example.orphanapp.ui.EnrollmentScreen
 import com.example.orphanapp.ui.HelpScreen
 import com.example.orphanapp.ui.LoginScreen
 import com.example.orphanapp.ui.OrphanProfileScreen
 import com.example.orphanapp.ui.PendingVerificationScreen
+import com.example.orphanapp.ui.PhotoGalleryScreen
 import com.example.orphanapp.ui.ReportScreen
 import com.example.orphanapp.ui.SettingsScreen
 import com.example.orphanapp.ui.TotalOrphansScreen
@@ -86,6 +89,15 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
         }
         composable("report") {
             ReportScreen(navController, orphanList)
+        }
+        composable("photo_gallery") {
+            PhotoGalleryScreen(navController)
+        }
+        composable("activity_log") {
+            ActivityLogScreen(navController)
+        }
+        composable("donation") {
+            DonationScreen(navController)
         }
     }
 }
