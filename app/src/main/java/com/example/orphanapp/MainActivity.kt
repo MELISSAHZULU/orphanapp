@@ -11,6 +11,7 @@ import com.example.orphanapp.ui.ActivityLogScreen
 import com.example.orphanapp.ui.AvailableBedsScreen
 import com.example.orphanapp.ui.BottomNavigationBar
 import com.example.orphanapp.ui.ChecklistScreen
+import com.example.orphanapp.ui.CommunicationScreen
 import com.example.orphanapp.ui.DashboardScreen
 import com.example.orphanapp.ui.DonationScreen
 import com.example.orphanapp.ui.EnrollmentScreen
@@ -110,6 +111,9 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
         }
         composable("staff_management") {
             StaffManagementScreen(navController)
+        }
+        composable("communication") {
+            CommunicationScreen(navController)
         }
     }
 }

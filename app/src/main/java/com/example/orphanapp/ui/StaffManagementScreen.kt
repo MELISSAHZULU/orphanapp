@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,8 +19,23 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.orphanapp.ui.theme.OrphanAppTheme
 
+data class StaffMember(val name: String, val role: String)
+data class Task(val description: String, val status: String)
+
 @Composable
 fun StaffManagementScreen(navController: NavController) {
+    val staffMembers = listOf(
+        StaffMember("Alice", "Administrator"),
+        StaffMember("Bob", "Caregiver"),
+        StaffMember("Charlie", "Cook")
+    )
+
+    val tasks = listOf(
+        Task("Prepare lunch", "In Progress"),
+        Task("Organize outdoor activities", "Pending"),
+        Task("Submit weekly report", "Completed")
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -29,10 +46,13 @@ fun StaffManagementScreen(navController: NavController) {
 
         Card(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.padding(16.dp)) {
-                Text("Role-Based Access", style = MaterialTheme.typography.titleMedium)
+                Text("Staff Members", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                // TODO: Implement role-based access controls
-                Text("Different interfaces or permissions based on staff roles will be configured here.")
+                LazyColumn {
+                    items(staffMembers) { staff ->
+                        Text("${staff.name} - ${staff.role}", modifier = Modifier.padding(vertical = 4.dp))
+                    }
+                }
             }
         }
 
@@ -42,8 +62,11 @@ fun StaffManagementScreen(navController: NavController) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Task Assignment & Tracking", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                // TODO: Implement task assignment and tracking
-                Text("A clear display of assigned tasks and their progress will be here.")
+                LazyColumn {
+                    items(tasks) { task ->
+                        Text("${task.description} - ${task.status}", modifier = Modifier.padding(vertical = 4.dp))
+                    }
+                }
             }
         }
     }
