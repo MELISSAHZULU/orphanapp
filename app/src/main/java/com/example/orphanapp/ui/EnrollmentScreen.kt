@@ -29,12 +29,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.viewmodel.EnrollmentViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EnrollmentScreen(navController: NavController, orphanList: MutableList<Orphan>, onEnrollmentSuccess: (Int) -> Unit) {
+fun EnrollmentScreen(
+    navController: NavController,
+    viewModel: EnrollmentViewModel = viewModel(),
+    onEnrollmentSuccess: (Int) -> Unit
+) {
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
@@ -92,14 +98,14 @@ fun EnrollmentScreen(navController: NavController, orphanList: MutableList<Orpha
             Button(
                 onClick = {
                     val newOrphan = Orphan(
-                        id = orphanList.size + 1,
+                        id = (viewModel.orphans.value.size + 1),
                         name = name,
                         age = age.toIntOrNull() ?: 0,
                         gender = gender,
                         birthCertificate = birthCertificate,
                         status = "Active"
                     )
-                    orphanList.add(newOrphan)
+                    viewModel.addOrphan(newOrphan)
                     onEnrollmentSuccess(newOrphan.id)
                 },
                 modifier = Modifier.fillMaxWidth()

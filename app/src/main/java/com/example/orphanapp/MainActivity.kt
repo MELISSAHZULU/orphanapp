@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.*
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.orphanapp.model.Orphan
 import com.example.orphanapp.ui.AboutScreen
@@ -29,6 +30,7 @@ import com.example.orphanapp.ui.TotalOrphansScreen
 import com.example.orphanapp.ui.TrackingScreen
 import com.example.orphanapp.ui.VerifiedOrphansScreen
 import com.example.orphanapp.ui.theme.OrphanAppTheme
+import com.example.orphanapp.viewmodel.EnrollmentViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,7 +47,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
     val navController = rememberNavController()
-    val orphanList = remember { mutableStateListOf<Orphan>() }
+    val enrollmentViewModel: EnrollmentViewModel = viewModel()
+    val orphanList by enrollmentViewModel.orphans.collectAsState()
 
     NavHost(navController = navController, startDestination = "login") {
         composable("login") {
@@ -55,7 +58,7 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
             DashboardScreen(navController)
         }
         composable("enrollment") {
-            EnrollmentScreen(navController, orphanList) { newOrphanId ->
+            EnrollmentScreen(navController, enrollmentViewModel) { newOrphanId ->
                 navController.navigate("profile/$newOrphanId")
             }
         }

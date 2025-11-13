@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -17,8 +19,21 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.orphanapp.ui.theme.OrphanAppTheme
 
+data class Message(val from: String, val content: String)
+data class Announcement(val title: String, val date: String)
+
 @Composable
 fun CommunicationScreen(navController: NavController) {
+    val messages = listOf(
+        Message("Alice", "Can you please check on the new supplies?"),
+        Message("Bob", "Sure, I will do it right away.")
+    )
+
+    val announcements = listOf(
+        Announcement("Christmas Party", "25th December 2024"),
+        Announcement("Annual General Meeting", "1st January 2025")
+    )
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -31,8 +46,11 @@ fun CommunicationScreen(navController: NavController) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Secure Messaging", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                // TODO: Implement secure messaging
-                Text("In-app communication channels for staff and potentially donors will be here.")
+                LazyColumn {
+                    items(messages) { message ->
+                        Text("${message.from}: ${message.content}", modifier = Modifier.padding(vertical = 4.dp))
+                    }
+                }
             }
         }
 
@@ -42,8 +60,11 @@ fun CommunicationScreen(navController: NavController) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text("Announcement Board", style = MaterialTheme.typography.titleMedium)
                 Spacer(modifier = Modifier.height(8.dp))
-                // TODO: Implement announcement board
-                Text("A clear display of important updates will be here.")
+                LazyColumn {
+                    items(announcements) { announcement ->
+                        Text("${announcement.title} - ${announcement.date}", modifier = Modifier.padding(vertical = 4.dp))
+                    }
+                }
             }
         }
     }

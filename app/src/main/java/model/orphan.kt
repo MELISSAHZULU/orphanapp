@@ -9,6 +9,12 @@ data class ActivityLog(
     val notes: String
 )
 
+data class Guardian(
+    val name: String,
+    val relation: String,
+    val contact: String
+)
+
 data class Orphan(
     val id: Int,
     val name: String,
@@ -16,5 +22,7 @@ data class Orphan(
     val gender: String,
     val birthCertificate: Boolean,
     var status: String = "Active",
+    val photoUrl: String? = null,
+    val guardians: MutableList<Guardian> = mutableListOf(),
     val activityLogs: MutableList<ActivityLog> = mutableListOf()
 )
