@@ -8,12 +8,17 @@ import com.example.orphanapp.model.Orphan
 import com.example.orphanapp.repository.OrphanRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class EnrollmentViewModel(private val repository: OrphanRepository) : ViewModel() {
 
     val orphans: StateFlow<List<Orphan>> = repository.getOrphans()
+        .catch { exception ->
+            Log.e("EnrollmentViewModel", "Error getting orphans", exception)
+            emit(emptyList()) // Emit an empty list on error to prevent crash
+        }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5000),

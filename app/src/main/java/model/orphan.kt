@@ -5,15 +5,15 @@ import java.util.Date
 
 data class ActivityLog(
     val id: Int? = null,
-    val date: Date,
-    val activity: String,
-    val notes: String
+    val date: Date = Date(),
+    val activity: String = "",
+    val notes: String = ""
 )
 
 data class Guardian(
-    val name: String,
-    val relation: String,
-    val contact: String
+    val name: String = "",
+    val relation: String = "",
+    val contact: String = ""
 )
 
 data class Orphan(

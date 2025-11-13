@@ -3,16 +3,12 @@ package com.example.orphanapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.viewModels
 import androidx.compose.runtime.*
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
-import com.example.orphanapp.model.Orphan
-import com.example.orphanapp.repository.AuthRepository
-import com.example.orphanapp.repository.OrphanRepositoryImpl
 import com.example.orphanapp.ui.AboutScreen
 import com.example.orphanapp.ui.ActivityLogScreen
 import com.example.orphanapp.ui.AvailableBedsScreen
-import com.example.orphanapp.ui.BottomNavigationBar
 import com.example.orphanapp.ui.ChecklistScreen
 import com.example.orphanapp.ui.CommunicationScreen
 import com.example.orphanapp.ui.DashboardScreen
@@ -39,36 +35,38 @@ import com.example.orphanapp.viewmodel.EnrollmentViewModel
 import com.example.orphanapp.viewmodel.EnrollmentViewModelFactory
 
 class MainActivity : ComponentActivity() {
+    private val authViewModel: AuthViewModel by viewModels { AuthViewModelFactory((application as OrphanApplication).authRepository) }
+    private val enrollmentViewModel: EnrollmentViewModel by viewModels { EnrollmentViewModelFactory((application as OrphanApplication).orphanRepository) }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             val isDarkMode = remember { mutableStateOf(false) }
             OrphanAppTheme(darkTheme = isDarkMode.value) {
-                OrphanageApp(isDarkMode)
+                OrphanageApp(isDarkMode, authViewModel, enrollmentViewModel)
             }
         }
     }
 }
 
 @Composable
-fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
+fun OrphanageApp(
+    isDarkMode: MutableState<Boolean>,
+    authViewModel: AuthViewModel,
+    enrollmentViewModel: EnrollmentViewModel
+) {
     val navController = rememberNavController()
-    val orphanRepository = remember { OrphanRepositoryImpl() }
-    val enrollmentViewModel: EnrollmentViewModel = viewModel(factory = EnrollmentViewModelFactory(orphanRepository))
     val orphanList by enrollmentViewModel.orphans.collectAsState()
-
-    val authRepository = remember { AuthRepository() }
-    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository))
     val user by authViewModel.user.collectAsState()
 
     val startDestination = if (user != null) "dashboard" else "login"
 
     NavHost(navController = navController, startDestination = startDestination) {
         composable("login") {
-            LoginScreen(navController)
+            LoginScreen(navController, authViewModel)
         }
         composable("register") {
-            RegisterScreen(navController)
+            RegisterScreen(navController, authViewModel)
         }
         composable("dashboard") {
             DashboardScreen(navController)

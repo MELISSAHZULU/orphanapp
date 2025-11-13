@@ -1,5 +1,6 @@
 package com.example.orphanapp.repository
 
+import android.util.Log
 import com.example.orphanapp.model.Orphan
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
@@ -20,12 +21,18 @@ class OrphanRepositoryImpl : OrphanRepository {
     override fun getOrphans(): Flow<List<Orphan>> = callbackFlow {
         val listenerRegistration = orphansCollection.addSnapshotListener { snapshot, error ->
             if (error != null) {
+                Log.w("OrphanRepository", "Listen error", error)
                 close(error)
                 return@addSnapshotListener
             }
-            if (snapshot != null) {
-                val orphans = snapshot.toObjects(Orphan::class.java)
-                trySend(orphans).isSuccess
+            try {
+                if (snapshot != null) {
+                    val orphans = snapshot.toObjects(Orphan::class.java)
+                    trySend(orphans).isSuccess
+                }
+            } catch (e: Exception) {
+                Log.e("OrphanRepository", "Error converting snapshot to objects", e)
+                close(e) // Close the flow on error
             }
         }
         awaitClose { listenerRegistration.remove() }

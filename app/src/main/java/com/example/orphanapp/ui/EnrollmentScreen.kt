@@ -29,7 +29,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.orphanapp.model.Orphan
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
@@ -38,7 +37,7 @@ import com.example.orphanapp.viewmodel.EnrollmentViewModel
 @Composable
 fun EnrollmentScreen(
     navController: NavController,
-    viewModel: EnrollmentViewModel = viewModel(),
+    viewModel: EnrollmentViewModel,
     onEnrollmentSuccess: (Int) -> Unit
 ) {
     var name by remember { mutableStateOf("") }
