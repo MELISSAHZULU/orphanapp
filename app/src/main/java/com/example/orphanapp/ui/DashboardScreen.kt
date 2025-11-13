@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.Bed
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.People
@@ -133,6 +134,10 @@ fun DashboardScreen(navController: NavController) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.PhotoLibrary, title = "Photo Gallery", value = "", onClick = { navController.navigate("photo_gallery") })
                     DashboardCard(icon = Icons.Filled.Assignment, title = "Activity Log", value = "", onClick = { navController.navigate("activity_log") })
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
+                    DashboardCard(icon = Icons.Filled.Favorite, title = "Donations", value = "", onClick = { navController.navigate("donation") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth()) {

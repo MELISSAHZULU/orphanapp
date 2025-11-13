@@ -15,6 +15,7 @@ import com.example.orphanapp.ui.DashboardScreen
 import com.example.orphanapp.ui.DonationScreen
 import com.example.orphanapp.ui.EnrollmentScreen
 import com.example.orphanapp.ui.HelpScreen
+import com.example.orphanapp.ui.ImpactReportingScreen
 import com.example.orphanapp.ui.LoginScreen
 import com.example.orphanapp.ui.OrphanProfileScreen
 import com.example.orphanapp.ui.PendingVerificationScreen
@@ -98,6 +99,9 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
         }
         composable("donation") {
             DonationScreen(navController)
+        }
+        composable("impact_reporting") {
+            ImpactReportingScreen(navController)
         }
     }
 }
