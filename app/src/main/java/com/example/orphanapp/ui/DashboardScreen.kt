@@ -3,6 +3,7 @@ package com.example.orphanapp.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Message
 import androidx.compose.material.icons.filled.Assignment
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Bed
@@ -26,9 +28,9 @@ import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.HourglassTop
 import androidx.compose.material.icons.filled.Inventory
 import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.Message
 import androidx.compose.material.icons.filled.People
 import androidx.compose.material.icons.filled.PhotoLibrary
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SupervisorAccount
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -41,6 +43,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.NavigationDrawerItem
+import androidx.compose.material3.NavigationDrawerItemDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,82 +54,33 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.orphanapp.R
+import com.example.orphanapp.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(navController: NavController) {
+fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
-                Column(modifier = Modifier.fillMaxSize()) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    NavigationDrawerItem(
-                        label = { Text("Activity Log") },
-                        selected = false,
-                        onClick = { navController.navigate("activity_log") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Donations") },
-                        selected = false,
-                        onClick = { navController.navigate("donation") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Impact Reporting") },
-                        selected = false,
-                        onClick = { navController.navigate("impact_reporting") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Inventory") },
-                        selected = false,
-                        onClick = { navController.navigate("inventory") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Staff Management") },
-                        selected = false,
-                        onClick = { navController.navigate("staff_management") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Communication") },
-                        selected = false,
-                        onClick = { navController.navigate("communication") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Settings") },
-                        selected = false,
-                        onClick = { navController.navigate("settings") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("About") },
-                        selected = false,
-                        onClick = { navController.navigate("about") }
-                    )
-                    NavigationDrawerItem(
-                        label = { Text("Help & Support") },
-                        selected = false,
-                        onClick = { navController.navigate("help") }
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    NavigationDrawerItem(
-                        label = { Text("Logout") },
-                        selected = false,
-                        onClick = { navController.navigate("login") },
-                        modifier = Modifier.padding(bottom = 12.dp)
-                    )
-                }
-            }
+            AppDrawer(
+                navController = navController,
+                authViewModel = authViewModel,
+                closeDrawer = { scope.launch { drawerState.close() } }
+            )
         }
     ) {
         Scaffold(
@@ -185,7 +139,7 @@ fun DashboardScreen(navController: NavController) {
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    DashboardCard(icon = Icons.Filled.Message, title = "Communication", value = "", onClick = { navController.navigate("communication") })
+                    DashboardCard(icon = Icons.AutoMirrored.Filled.Message, title = "Communication", value = "", onClick = { navController.navigate("communication") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth()) {
@@ -203,6 +157,75 @@ fun DashboardScreen(navController: NavController) {
         }
     }
 }
+
+@Composable
+fun AppDrawer(
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    closeDrawer: () -> Unit
+) {
+    val scrollState = rememberScrollState()
+    val user = authViewModel.user.collectAsState().value
+    val drawerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else Color(0xFF1A237E)
+    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.White
+
+    ModalDrawerSheet(
+        drawerContainerColor = drawerColor
+    ) {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Header
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Image(
+                    painter = painterResource(id = R.drawable.ic_launcher_foreground),
+                    contentDescription = "Profile Picture",
+                    modifier = Modifier
+                        .size(100.dp)
+                        .clip(CircleShape)
+                        .background(Color.White)
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(text = user?.displayName ?: "Alexandra", color = textColor, style = MaterialTheme.typography.headlineSmall)
+                Text(text = user?.email ?: "alexandra@gmail.com", color = textColor, style = MaterialTheme.typography.bodyMedium)
+            }
+            // Menu Items
+            Column(modifier = Modifier.verticalScroll(scrollState)) {
+                DrawerItem(icon = Icons.Filled.People, text = "Home", onClick = { navController.navigate("dashboard"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.SupervisorAccount, text = "My Profile", onClick = { /* TODO */ })
+                DrawerItem(icon = Icons.Filled.Inventory, text = "My Vacancy", onClick = { /* TODO */ })
+                DrawerItem(icon = Icons.AutoMirrored.Filled.Message, text = "Message", onClick = { navController.navigate("communication"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.Favorite, text = "Subscription", onClick = { /* TODO */ })
+                DrawerItem(icon = Icons.Filled.CheckCircle, text = "Notification", onClick = { /* TODO */ })
+                DrawerItem(icon = Icons.Filled.Settings, text = "Setting", onClick = { navController.navigate("settings"); closeDrawer() })
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            // Footer
+            DrawerItem(icon = Icons.Filled.BarChart, text = "Log Out", onClick = {
+                authViewModel.signOut()
+                navController.navigate("login") {
+                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
+                }
+            })
+        }
+    }
+}
+
+@Composable
+fun DrawerItem(icon: ImageVector, text: String, onClick: () -> Unit) {
+    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.White
+    NavigationDrawerItem(
+        icon = { Icon(icon, contentDescription = text, tint = textColor) },
+        label = { Text(text, color = textColor) },
+        selected = false,
+        onClick = onClick,
+        colors = NavigationDrawerItemDefaults.colors(unselectedContainerColor = Color.Transparent)
+    )
+}
+
 
 @Composable
 fun DashboardCard(icon: ImageVector, title: String, value: String, onClick: () -> Unit) {

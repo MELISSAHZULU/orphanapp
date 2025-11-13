@@ -20,10 +20,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.orphanapp.viewmodel.AuthViewModel
 
 @Composable
-fun LoginScreen(navController: NavController) {
+fun LoginScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
 
@@ -55,7 +57,7 @@ fun LoginScreen(navController: NavController) {
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = { /* TODO: Handle login */ },
+            onClick = { authViewModel.signIn(email, password) },
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Login")

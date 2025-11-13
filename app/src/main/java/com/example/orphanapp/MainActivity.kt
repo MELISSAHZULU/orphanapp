@@ -7,6 +7,7 @@ import androidx.compose.runtime.*
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.repository.AuthRepository
 import com.example.orphanapp.repository.OrphanRepositoryImpl
 import com.example.orphanapp.ui.AboutScreen
 import com.example.orphanapp.ui.ActivityLogScreen
@@ -24,6 +25,7 @@ import com.example.orphanapp.ui.LoginScreen
 import com.example.orphanapp.ui.OrphanProfileScreen
 import com.example.orphanapp.ui.PendingVerificationScreen
 import com.example.orphanapp.ui.PhotoGalleryScreen
+import com.example.orphanapp.ui.RegisterScreen
 import com.example.orphanapp.ui.ReportScreen
 import com.example.orphanapp.ui.SettingsScreen
 import com.example.orphanapp.ui.StaffManagementScreen
@@ -31,6 +33,8 @@ import com.example.orphanapp.ui.TotalOrphansScreen
 import com.example.orphanapp.ui.TrackingScreen
 import com.example.orphanapp.ui.VerifiedOrphansScreen
 import com.example.orphanapp.ui.theme.OrphanAppTheme
+import com.example.orphanapp.viewmodel.AuthViewModel
+import com.example.orphanapp.viewmodel.AuthViewModelFactory
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
 import com.example.orphanapp.viewmodel.EnrollmentViewModelFactory
 
@@ -53,9 +57,18 @@ fun OrphanageApp(isDarkMode: MutableState<Boolean>) {
     val enrollmentViewModel: EnrollmentViewModel = viewModel(factory = EnrollmentViewModelFactory(orphanRepository))
     val orphanList by enrollmentViewModel.orphans.collectAsState()
 
-    NavHost(navController = navController, startDestination = "login") {
+    val authRepository = remember { AuthRepository() }
+    val authViewModel: AuthViewModel = viewModel(factory = AuthViewModelFactory(authRepository))
+    val user by authViewModel.user.collectAsState()
+
+    val startDestination = if (user != null) "dashboard" else "login"
+
+    NavHost(navController = navController, startDestination = startDestination) {
         composable("login") {
             LoginScreen(navController)
+        }
+        composable("register") {
+            RegisterScreen(navController)
         }
         composable("dashboard") {
             DashboardScreen(navController)
