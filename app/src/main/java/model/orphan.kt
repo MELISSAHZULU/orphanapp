@@ -1,9 +1,10 @@
 package com.example.orphanapp.model
 
+import com.google.firebase.firestore.DocumentId
 import java.util.Date
 
 data class ActivityLog(
-    val id: Int,
+    val id: Int? = null,
     val date: Date,
     val activity: String,
     val notes: String
@@ -16,11 +17,12 @@ data class Guardian(
 )
 
 data class Orphan(
-    val id: Int,
-    val name: String,
-    val age: Int,
-    val gender: String,
-    val birthCertificate: Boolean,
+    @DocumentId val documentId: String = "",
+    val id: Int? = null,
+    val name: String = "",
+    val age: Int = 0,
+    val gender: String = "",
+    val birthCertificate: Boolean = false,
     var status: String = "Active",
     val photoUrl: String? = null,
     val guardians: MutableList<Guardian> = mutableListOf(),

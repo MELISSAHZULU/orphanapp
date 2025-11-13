@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "317303703188",
+    "project_id": "orphanapp-a1681",
+    "storage_bucket": "orphanapp-a1681.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:317303703188:android:8842c91714db0167475681",
+        "android_client_info": {
+          "package_name": "com.example.orphanapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZXywJgK3Uxn8eFZD7-WpEULaHk-pkZv8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

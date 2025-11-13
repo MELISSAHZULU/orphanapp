@@ -1,9 +1,11 @@
 package com.example.orphanapp.repository
 
 import com.example.orphanapp.model.Orphan
+import com.google.firebase.firestore.FirebaseFirestore
+import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.tasks.await
 
 interface OrphanRepository {
     fun getOrphans(): Flow<List<Orphan>>
@@ -12,20 +14,30 @@ interface OrphanRepository {
 }
 
 class OrphanRepositoryImpl : OrphanRepository {
-    private val _orphans = MutableStateFlow<List<Orphan>>(emptyList())
+    private val firestore = FirebaseFirestore.getInstance()
+    private val orphansCollection = firestore.collection("orphans")
 
-    override fun getOrphans(): Flow<List<Orphan>> = _orphans.asStateFlow()
+    override fun getOrphans(): Flow<List<Orphan>> = callbackFlow {
+        val listenerRegistration = orphansCollection.addSnapshotListener { snapshot, error ->
+            if (error != null) {
+                close(error)
+                return@addSnapshotListener
+            }
+            if (snapshot != null) {
+                val orphans = snapshot.toObjects(Orphan::class.java)
+                trySend(orphans).isSuccess
+            }
+        }
+        awaitClose { listenerRegistration.remove() }
+    }
 
     override suspend fun addOrphan(orphan: Orphan) {
-        _orphans.value = _orphans.value + orphan
+        orphansCollection.add(orphan).await()
     }
 
     override suspend fun updateOrphan(orphan: Orphan) {
-        val currentList = _orphans.value.toMutableList()
-        val index = currentList.indexOfFirst { it.id == orphan.id }
-        if (index != -1) {
-            currentList[index] = orphan
-            _orphans.value = currentList
+        if (orphan.documentId.isNotEmpty()) {
+            orphansCollection.document(orphan.documentId).set(orphan).await()
         }
     }
 }
