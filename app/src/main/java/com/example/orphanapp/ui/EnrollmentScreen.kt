@@ -106,7 +106,7 @@ fun EnrollmentScreen(
                         status = "Active"
                     )
                     viewModel.addOrphan(newOrphan)
-                    onEnrollmentSuccess(newOrphan.id)
+                    onEnrollmentSuccess(newOrphan.id!!)
                 },
                 modifier = Modifier.fillMaxWidth()
             ) {

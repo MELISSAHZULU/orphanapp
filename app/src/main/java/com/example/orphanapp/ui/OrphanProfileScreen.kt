@@ -14,6 +14,7 @@ import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -44,11 +45,13 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Orphan Profile: ${orphan?.name ?: ""}") },
+                title = { Text(if (orphan != null) "Orphan Profile: ${orphan.name}" else "Loading...") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
                 actions = {
-                    IconButton(onClick = { isEditing = !isEditing }) {
-                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                    if (orphan != null) {
+                        IconButton(onClick = { isEditing = !isEditing }) {
+                            Icon(Icons.Default.Edit, contentDescription = "Edit")
+                        }
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -62,7 +65,17 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
             BottomNavigationBar(navController, "profile")
         }
     ) { padding ->
-        if (orphan != null) {
+        if (orphan == null) {
+            Column(
+                modifier = Modifier.fillMaxSize().padding(padding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                CircularProgressIndicator()
+                Spacer(modifier = Modifier.height(16.dp))
+                Text("Loading orphan data...")
+            }
+        } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -129,10 +142,6 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                         Text("Back to List", color = MaterialTheme.colorScheme.primary)
                     }
                 }
-            }
-        } else {
-            Column(modifier = Modifier.padding(padding).padding(16.dp)) {
-                Text("Orphan not found. Please enroll an orphan first.")
             }
         }
     }

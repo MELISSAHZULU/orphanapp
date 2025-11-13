@@ -1,5 +1,6 @@
 package com.example.orphanapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -16,13 +17,23 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
-            _user.value = repository.signIn(email, password)
+            try {
+                _user.value = repository.signIn(email, password)
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Sign in failed", e)
+                // Optionally, you can expose an error state to the UI
+            }
         }
     }
 
     fun register(email: String, password: String) {
         viewModelScope.launch {
-            _user.value = repository.register(email, password)
+            try {
+                _user.value = repository.register(email, password)
+            } catch (e: Exception) {
+                Log.e("AuthViewModel", "Registration failed", e)
+                // Optionally, you can expose an error state to the UI
+            }
         }
     }
 

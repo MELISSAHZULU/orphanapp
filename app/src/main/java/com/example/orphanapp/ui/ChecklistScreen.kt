@@ -39,7 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import coil.compose.rememberAsyncImagePainter
+import coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -228,8 +228,8 @@ fun PhotoAttachment() {
             contentAlignment = Alignment.Center
         ) {
             if (imageUri != null) {
-                Image(
-                    painter = rememberAsyncImagePainter(imageUri),
+                AsyncImage(
+                    model = imageUri,
                     contentDescription = "Selected image",
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop

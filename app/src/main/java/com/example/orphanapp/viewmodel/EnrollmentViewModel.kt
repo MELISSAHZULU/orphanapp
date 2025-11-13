@@ -1,5 +1,6 @@
 package com.example.orphanapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -21,13 +22,21 @@ class EnrollmentViewModel(private val repository: OrphanRepository) : ViewModel(
 
     fun addOrphan(orphan: Orphan) {
         viewModelScope.launch {
-            repository.addOrphan(orphan)
+            try {
+                repository.addOrphan(orphan)
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Failed to add orphan", e)
+            }
         }
     }
 
     fun updateOrphan(orphan: Orphan) {
         viewModelScope.launch {
-            repository.updateOrphan(orphan)
+            try {
+                repository.updateOrphan(orphan)
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Failed to update orphan", e)
+            }
         }
     }
 }
