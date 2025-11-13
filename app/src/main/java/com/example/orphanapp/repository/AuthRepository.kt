@@ -1,25 +1,35 @@
 package com.example.orphanapp.repository
 
+import com.example.orphanapp.model.User
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.tasks.await
 
-class AuthRepository {
+interface AuthRepository {
+    suspend fun signIn(email: String, password: String): User?
+    suspend fun register(email: String, password: String): User?
+    fun getCurrentUser(): User?
+    fun signOut()
+}
+
+class AuthRepositoryImpl : AuthRepository {
     private val firebaseAuth = FirebaseAuth.getInstance()
 
-    suspend fun signIn(email: String, password: String): FirebaseUser? {
-        return firebaseAuth.signInWithEmailAndPassword(email, password).await().user
+    private fun FirebaseUser.toUser(): User = User(uid = this.uid, email = this.email)
+
+    override suspend fun signIn(email: String, password: String): User? {
+        return firebaseAuth.signInWithEmailAndPassword(email, password).await().user?.toUser()
     }
 
-    suspend fun register(email: String, password: String): FirebaseUser? {
-        return firebaseAuth.createUserWithEmailAndPassword(email, password).await().user
+    override suspend fun register(email: String, password: String): User? {
+        return firebaseAuth.createUserWithEmailAndPassword(email, password).await().user?.toUser()
     }
 
-    fun getCurrentUser(): FirebaseUser? {
-        return firebaseAuth.currentUser
+    override fun getCurrentUser(): User? {
+        return firebaseAuth.currentUser?.toUser()
     }
 
-    fun signOut() {
+    override fun signOut() {
         firebaseAuth.signOut()
     }
 }

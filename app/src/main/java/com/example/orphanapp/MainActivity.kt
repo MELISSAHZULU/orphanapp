@@ -4,7 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
 import androidx.navigation.compose.*
 import com.example.orphanapp.ui.AboutScreen
 import com.example.orphanapp.ui.ActivityLogScreen
@@ -29,6 +35,7 @@ import com.example.orphanapp.ui.TotalOrphansScreen
 import com.example.orphanapp.ui.TrackingScreen
 import com.example.orphanapp.ui.VerifiedOrphansScreen
 import com.example.orphanapp.ui.theme.OrphanAppTheme
+import com.example.orphanapp.viewmodel.AuthState
 import com.example.orphanapp.viewmodel.AuthViewModel
 import com.example.orphanapp.viewmodel.AuthViewModelFactory
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
@@ -57,82 +64,95 @@ fun OrphanageApp(
 ) {
     val navController = rememberNavController()
     val orphanList by enrollmentViewModel.orphans.collectAsState()
-    val user by authViewModel.user.collectAsState()
+    val authState by authViewModel.authState.collectAsState()
 
-    val startDestination = if (user != null) "dashboard" else "login"
-
-    NavHost(navController = navController, startDestination = startDestination) {
-        composable("login") {
-            LoginScreen(navController, authViewModel)
-        }
-        composable("register") {
-            RegisterScreen(navController, authViewModel)
-        }
-        composable("dashboard") {
-            DashboardScreen(navController)
-        }
-        composable("enrollment") {
-            EnrollmentScreen(navController, enrollmentViewModel) { newOrphanId ->
-                navController.navigate("profile/$newOrphanId")
+    when (authState) {
+        is AuthState.Loading -> {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
             }
         }
-        composable("tracking") {
-            TrackingScreen(orphanList, navController)
-        }
-        composable("profile/{id}") { backStackEntry ->
-            val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-            val orphan = orphanList.find { it.id == id }
-            OrphanProfileScreen(navController, orphan) { updatedOrphan ->
-                enrollmentViewModel.updateOrphan(updatedOrphan)
+        is AuthState.Authenticated -> {
+            NavHost(navController = navController, startDestination = "dashboard") {
+                // Auth routes are not needed here as we are already authenticated
+                composable("dashboard") {
+                    DashboardScreen(navController, authViewModel)
+                }
+                 composable("enrollment") {
+                    EnrollmentScreen(navController, enrollmentViewModel) { newOrphanId ->
+                        navController.navigate("profile/$newOrphanId")
+                    }
+                }
+                composable("tracking") {
+                    TrackingScreen(orphanList, navController)
+                }
+                composable("profile/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
+                    val orphan = orphanList.find { it.id == id }
+                    OrphanProfileScreen(navController, orphan) { updatedOrphan ->
+                        enrollmentViewModel.updateOrphan(updatedOrphan)
+                    }
+                }
+                composable("checklist") {
+                    ChecklistScreen(navController)
+                }
+                composable("settings") {
+                    SettingsScreen(navController, isDarkMode)
+                }
+                composable("about") {
+                    AboutScreen(navController)
+                }
+                composable("help") {
+                    HelpScreen(navController)
+                }
+                composable("total_orphans") {
+                    TotalOrphansScreen(navController, orphanList)
+                }
+                composable("verified_orphans") {
+                    VerifiedOrphansScreen(navController, orphanList.filter { it.status == "Active" })
+                }
+                composable("pending_verification") {
+                    PendingVerificationScreen(navController, orphanList.filter { it.status != "Active" })
+                }
+                composable("available_beds") {
+                    AvailableBedsScreen(navController)
+                }
+                composable("report") {
+                    ReportScreen(navController, orphanList)
+                }
+                composable("photo_gallery") {
+                    PhotoGalleryScreen(navController)
+                }
+                composable("activity_log") {
+                    ActivityLogScreen(navController)
+                }
+                composable("donation") {
+                    DonationScreen(navController)
+                }
+                composable("impact_reporting") {
+                    ImpactReportingScreen(navController)
+                }
+                composable("inventory") {
+                    InventoryScreen(navController)
+                }
+                composable("staff_management") {
+                    StaffManagementScreen(navController)
+                }
+                composable("communication") {
+                    CommunicationScreen(navController)
+                }
             }
         }
-        composable("checklist") {
-            ChecklistScreen(navController)
-        }
-        composable("settings") {
-            SettingsScreen(navController, isDarkMode)
-        }
-        composable("about") {
-            AboutScreen(navController)
-        }
-        composable("help") {
-            HelpScreen(navController)
-        }
-        composable("total_orphans") {
-            TotalOrphansScreen(navController, orphanList)
-        }
-        composable("verified_orphans") {
-            VerifiedOrphansScreen(navController, orphanList.filter { it.status == "Active" })
-        }
-        composable("pending_verification") {
-            PendingVerificationScreen(navController, orphanList.filter { it.status != "Active" })
-        }
-        composable("available_beds") {
-            AvailableBedsScreen(navController)
-        }
-        composable("report") {
-            ReportScreen(navController, orphanList)
-        }
-        composable("photo_gallery") {
-            PhotoGalleryScreen(navController)
-        }
-        composable("activity_log") {
-            ActivityLogScreen(navController)
-        }
-        composable("donation") {
-            DonationScreen(navController)
-        }
-        composable("impact_reporting") {
-            ImpactReportingScreen(navController)
-        }
-        composable("inventory") {
-            InventoryScreen(navController)
-        }
-        composable("staff_management") {
-            StaffManagementScreen(navController)
-        }
-        composable("communication") {
-            CommunicationScreen(navController)
+        is AuthState.Unauthenticated -> {
+            NavHost(navController = navController, startDestination = "login") {
+                composable("login") {
+                    LoginScreen(navController, authViewModel)
+                }
+                composable("register") {
+                    RegisterScreen(navController, authViewModel)
+                }
+                 // Other routes are not accessible when unauthenticated
+            }
         }
     }
 }

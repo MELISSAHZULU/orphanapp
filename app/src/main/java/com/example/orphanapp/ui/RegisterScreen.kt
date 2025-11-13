@@ -10,9 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -28,15 +27,6 @@ import com.example.orphanapp.viewmodel.AuthViewModel
 fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    val user by authViewModel.user.collectAsState()
-
-    LaunchedEffect(user) {
-        if (user != null) {
-            navController.navigate("dashboard") {
-                popUpTo("login") { inclusive = true }
-            }
-        }
-    }
 
     Column(
         modifier = Modifier
@@ -70,6 +60,9 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Text("Register")
+        }
+        TextButton(onClick = { navController.navigate("login") }) {
+            Text("Already have an account? Login")
         }
     }
 }

@@ -4,24 +4,44 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.orphanapp.model.User
 import com.example.orphanapp.repository.AuthRepository
-import com.google.firebase.auth.FirebaseUser
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
+sealed class AuthState {
+    object Loading : AuthState()
+    data class Authenticated(val user: User) : AuthState()
+    object Unauthenticated : AuthState()
+}
+
 class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
-    private val _user = MutableStateFlow<FirebaseUser?>(repository.getCurrentUser())
-    val user: StateFlow<FirebaseUser?> = _user
+    private val _authState = MutableStateFlow<AuthState>(AuthState.Loading)
+    val authState: StateFlow<AuthState> = _authState
+
+    init {
+        viewModelScope.launch {
+            val user = repository.getCurrentUser()
+            if (user != null) {
+                _authState.value = AuthState.Authenticated(user)
+            } else {
+                _authState.value = AuthState.Unauthenticated
+            }
+        }
+    }
 
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             try {
-                _user.value = repository.signIn(email, password)
+                val user = repository.signIn(email, password)
+                if (user != null) {
+                    _authState.value = AuthState.Authenticated(user)
+                }
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Sign in failed", e)
-                // Optionally, you can expose an error state to the UI
+                _authState.value = AuthState.Unauthenticated
             }
         }
     }
@@ -29,17 +49,20 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun register(email: String, password: String) {
         viewModelScope.launch {
             try {
-                _user.value = repository.register(email, password)
+                val user = repository.register(email, password)
+                if (user != null) {
+                    _authState.value = AuthState.Authenticated(user)
+                }
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Registration failed", e)
-                // Optionally, you can expose an error state to the UI
+                _authState.value = AuthState.Unauthenticated
             }
         }
     }
 
     fun signOut() {
         repository.signOut()
-        _user.value = null
+        _authState.value = AuthState.Unauthenticated
     }
 }
 

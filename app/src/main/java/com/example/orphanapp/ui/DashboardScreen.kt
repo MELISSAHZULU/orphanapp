@@ -20,18 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Message
-import androidx.compose.material.icons.filled.Assignment
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.Bed
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.HourglassTop
-import androidx.compose.material.icons.filled.Inventory
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.People
-import androidx.compose.material.icons.filled.PhotoLibrary
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.SupervisorAccount
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -61,15 +50,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import com.example.orphanapp.R
+import com.example.orphanapp.viewmodel.AuthState
 import com.example.orphanapp.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel = viewModel()) {
+fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
 
@@ -142,7 +132,7 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel =
                     DashboardCard(icon = Icons.AutoMirrored.Filled.Message, title = "Communication", value = "", onClick = { navController.navigate("communication") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { navController.navigate("enrollment") }, modifier = Modifier.fillMaxWidth()) {
                     Text("Register New Orphan")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -165,9 +155,10 @@ fun AppDrawer(
     closeDrawer: () -> Unit
 ) {
     val scrollState = rememberScrollState()
-    val user = authViewModel.user.collectAsState().value
-    val drawerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else Color(0xFF1A237E)
-    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else Color.White
+    val authState by authViewModel.authState.collectAsState()
+    val user = (authState as? AuthState.Authenticated)?.user
+    val drawerColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.surface else MaterialTheme.colorScheme.primary
+    val textColor = if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.onPrimary
 
     ModalDrawerSheet(
         drawerContainerColor = drawerColor
@@ -189,26 +180,24 @@ fun AppDrawer(
                         .background(Color.White)
                 )
                 Spacer(modifier = Modifier.height(8.dp))
-                Text(text = user?.displayName ?: "Alexandra", color = textColor, style = MaterialTheme.typography.headlineSmall)
+                val displayName = user?.email?.substringBefore('@')?.replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() } ?: "Alexandra"
+                Text(text = displayName, color = textColor, style = MaterialTheme.typography.headlineSmall)
                 Text(text = user?.email ?: "alexandra@gmail.com", color = textColor, style = MaterialTheme.typography.bodyMedium)
             }
             // Menu Items
             Column(modifier = Modifier.verticalScroll(scrollState)) {
-                DrawerItem(icon = Icons.Filled.People, text = "Home", onClick = { navController.navigate("dashboard"); closeDrawer() })
-                DrawerItem(icon = Icons.Filled.SupervisorAccount, text = "My Profile", onClick = { /* TODO */ })
-                DrawerItem(icon = Icons.Filled.Inventory, text = "My Vacancy", onClick = { /* TODO */ })
-                DrawerItem(icon = Icons.AutoMirrored.Filled.Message, text = "Message", onClick = { navController.navigate("communication"); closeDrawer() })
-                DrawerItem(icon = Icons.Filled.Favorite, text = "Subscription", onClick = { /* TODO */ })
-                DrawerItem(icon = Icons.Filled.CheckCircle, text = "Notification", onClick = { /* TODO */ })
-                DrawerItem(icon = Icons.Filled.Settings, text = "Setting", onClick = { navController.navigate("settings"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.Home, text = "Home", onClick = { navController.navigate("dashboard"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.PersonAdd, text = "Enrollment", onClick = { navController.navigate("enrollment"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.LocationOn, text = "Tracking", onClick = { navController.navigate("tracking"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.Favorite, text = "Donations", onClick = { navController.navigate("donation"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.Assessment, text = "Reports", onClick = { navController.navigate("report"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.Settings, text = "Settings", onClick = { navController.navigate("settings"); closeDrawer() })
             }
             Spacer(modifier = Modifier.weight(1f))
             // Footer
-            DrawerItem(icon = Icons.Filled.BarChart, text = "Log Out", onClick = {
+            DrawerItem(icon = Icons.AutoMirrored.Filled.Logout, text = "Log Out", onClick = {
                 authViewModel.signOut()
-                navController.navigate("login") {
-                    popUpTo(navController.graph.startDestinationId) { inclusive = true }
-                }
+                closeDrawer()
             })
         }
     }
