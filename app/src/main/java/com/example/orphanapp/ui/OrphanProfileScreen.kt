@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -18,6 +19,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -33,6 +35,10 @@ import com.example.orphanapp.model.Orphan
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
+    var isEditing by remember { mutableStateOf(false) }
+    var name by remember { mutableStateOf(orphan?.name ?: "") }
+    var age by remember { mutableStateOf(orphan?.age?.toString() ?: "") }
+    var gender by remember { mutableStateOf(orphan?.gender ?: "") }
     var status by remember { mutableStateOf(orphan?.status ?: "") }
 
     Scaffold(
@@ -40,6 +46,11 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
             TopAppBar(
                 title = { Text("Orphan Profile: ${orphan?.name ?: ""}") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
+                actions = {
+                    IconButton(onClick = { isEditing = !isEditing }) {
+                        Icon(Icons.Default.Edit, contentDescription = "Edit")
+                    }
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -61,11 +72,18 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
                 // Basic Info Card
                 Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Name: ${orphan.name}", style = MaterialTheme.typography.bodyLarge)
-                        Text("Age: ${orphan.age}", style = MaterialTheme.typography.bodyLarge)
-                        Text("Gender: ${orphan.gender}", style = MaterialTheme.typography.bodyLarge)
-                        Text("Enrollment Date: 2025-10-10", style = MaterialTheme.typography.bodyLarge) // Placeholder
-                        Text("Status: $status", style = MaterialTheme.typography.bodyLarge)
+                        if (isEditing) {
+                            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
+                            OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") })
+                            OutlinedTextField(value = gender, onValueChange = { gender = it }, label = { Text("Gender") })
+                            OutlinedTextField(value = status, onValueChange = { status = it }, label = { Text("Status") })
+                        } else {
+                            Text("Name: $name", style = MaterialTheme.typography.bodyLarge)
+                            Text("Age: $age", style = MaterialTheme.typography.bodyLarge)
+                            Text("Gender: $gender", style = MaterialTheme.typography.bodyLarge)
+                            Text("Enrollment Date: 2025-10-10", style = MaterialTheme.typography.bodyLarge) // Placeholder
+                            Text("Status: $status", style = MaterialTheme.typography.bodyLarge)
+                        }
                     }
                 }
 
@@ -86,11 +104,23 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?) {
 
                 // Action Buttons
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
-                    Button(onClick = {
-                        orphan.status = "Updated"
-                        status = "Updated"
-                    }) {
-                        Text("Update Status")
+                    if (isEditing) {
+                        Button(onClick = {
+                            orphan.name = name
+                            orphan.age = age.toIntOrNull() ?: orphan.age
+                            orphan.gender = gender
+                            orphan.status = status
+                            isEditing = false
+                        }) {
+                            Text("Save")
+                        }
+                    } else {
+                        Button(onClick = {
+                            orphan.status = "Updated"
+                            status = "Updated"
+                        }) {
+                            Text("Update Status")
+                        }
                     }
                     OutlinedButton(onClick = { navController.navigate("tracking") }) {
                         Text("Back to List", color = MaterialTheme.colorScheme.primary)

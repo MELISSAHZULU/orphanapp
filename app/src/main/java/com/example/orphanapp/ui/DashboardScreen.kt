@@ -71,27 +71,61 @@ fun DashboardScreen(navController: NavController) {
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheet {
-                Spacer(modifier = Modifier.height(12.dp))
-                NavigationDrawerItem(
-                    label = { Text("Settings") },
-                    selected = false,
-                    onClick = { navController.navigate("settings") }
-                )
-                NavigationDrawerItem(
-                    label = { Text("About") },
-                    selected = false,
-                    onClick = { navController.navigate("about") }
-                )
-                NavigationDrawerItem(
-                    label = { Text("Help & Support") },
-                    selected = false,
-                    onClick = { navController.navigate("help") }
-                )
-                NavigationDrawerItem(
-                    label = { Text("Logout") },
-                    selected = false,
-                    onClick = { navController.navigate("login") }
-                )
+                Column(modifier = Modifier.fillMaxSize()) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    NavigationDrawerItem(
+                        label = { Text("Activity Log") },
+                        selected = false,
+                        onClick = { navController.navigate("activity_log") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Donations") },
+                        selected = false,
+                        onClick = { navController.navigate("donation") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Impact Reporting") },
+                        selected = false,
+                        onClick = { navController.navigate("impact_reporting") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Inventory") },
+                        selected = false,
+                        onClick = { navController.navigate("inventory") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Staff Management") },
+                        selected = false,
+                        onClick = { navController.navigate("staff_management") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Communication") },
+                        selected = false,
+                        onClick = { navController.navigate("communication") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Settings") },
+                        selected = false,
+                        onClick = { navController.navigate("settings") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("About") },
+                        selected = false,
+                        onClick = { navController.navigate("about") }
+                    )
+                    NavigationDrawerItem(
+                        label = { Text("Help & Support") },
+                        selected = false,
+                        onClick = { navController.navigate("help") }
+                    )
+                    Spacer(modifier = Modifier.weight(1f))
+                    NavigationDrawerItem(
+                        label = { Text("Logout") },
+                        selected = false,
+                        onClick = { navController.navigate("login") },
+                        modifier = Modifier.padding(bottom = 12.dp)
+                    )
+                }
             }
         }
     ) {

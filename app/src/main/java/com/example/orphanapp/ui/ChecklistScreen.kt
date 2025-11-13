@@ -1,5 +1,9 @@
 package com.example.orphanapp.ui
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,9 +35,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import coil.compose.rememberAsyncImagePainter
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -202,6 +208,11 @@ fun ChecklistTextField(label: String, value: String, onValueChange: (String) -> 
 
 @Composable
 fun PhotoAttachment() {
+    var imageUri by remember { mutableStateOf<Uri?>(null) }
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) {
+        imageUri = it
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -216,11 +227,20 @@ fun PhotoAttachment() {
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
-            Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text("Insert Child’s Photo here")
-                Spacer(modifier = Modifier.height(8.dp))
-                IconButton(onClick = { /* Handle photo attachment */ }) {
-                    Icon(Icons.Default.AddAPhoto, contentDescription = "Add Photo", modifier = Modifier.size(48.dp))
+            if (imageUri != null) {
+                Image(
+                    painter = rememberAsyncImagePainter(imageUri),
+                    contentDescription = "Selected image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            } else {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Insert Child’s Photo here")
+                    Spacer(modifier = Modifier.height(8.dp))
+                    IconButton(onClick = { launcher.launch("image/*") }) {
+                        Icon(Icons.Default.AddAPhoto, contentDescription = "Add Photo", modifier = Modifier.size(48.dp))
+                    }
                 }
             }
         }
