@@ -31,7 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 data class InventoryItem(
-    val id: Int,
+    val id: Int, // Add id for navigation
     val name: String,
     val category: String,
     val status: String,
@@ -46,6 +46,7 @@ fun InventoryScreen(navController: NavController) {
     var selectedCategory by remember { mutableStateOf("Food") }
 
     val categories = listOf("Food", "Clothes", "Medicine", "Cleaning")
+    // Add IDs to the items
     val allItems = listOf(
         InventoryItem(1, "Rice", "Food", "Out of stock", "0 kg", Icons.Default.Restaurant),
         InventoryItem(2, "Sweets", "Food", "Out of stock", "0 units", Icons.Default.Cake),
@@ -106,6 +107,7 @@ fun InventoryScreen(navController: NavController) {
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(filteredItems) { item ->
                     InventoryListItem(item = item) {
+                        // Navigate to edit screen with item ID
                         navController.navigate("add_edit_inventory_item/${item.id}")
                     }
                 }
@@ -120,7 +122,7 @@ fun InventoryListItem(item: InventoryItem, onClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick),
+            .clickable(onClick = onClick), // Make the whole card clickable
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

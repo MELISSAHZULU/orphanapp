@@ -122,6 +122,14 @@ fun OrphanageApp(
                 composable("user_profile") {
                     UserProfileScreen(navController)
                 }
+                composable("add_edit_inventory_item/{itemId}") { backStackEntry ->
+                    val itemId = backStackEntry.arguments?.getString("itemId")?.toIntOrNull()
+                    AddEditInventoryItemScreen(navController, itemId)
+                }
+                composable("add_edit_inventory_item") {
+                    AddEditInventoryItemScreen(navController, null)
+                }
+
             }
         }
         is AuthState.Unauthenticated, is AuthState.Error -> {
