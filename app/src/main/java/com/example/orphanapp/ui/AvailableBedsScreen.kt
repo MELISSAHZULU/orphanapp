@@ -50,8 +50,8 @@ fun AvailableBedsScreen(navController: NavController) {
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                 BedInfoCard(title = "Total Beds", value = "100")
-                BedInfoCard(title = "Occupied Beds", value = "80")
-                BedInfoCard(title = "Available Beds", value = "20")
+                BedInfoCard(title = "Occupied Beds", value = "7")
+                BedInfoCard(title = "Available Beds", value = "93")
             }
         }
     }

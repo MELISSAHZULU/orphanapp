@@ -8,11 +8,12 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileScreen(navController: NavController) {
+fun UserProfilePage(navController: NavController) {
     Scaffold(
         topBar = {
             TopAppBar(
@@ -26,7 +27,7 @@ fun UserProfileScreen(navController: NavController) {
                 .fillMaxSize()
                 .padding(padding)
         ) {
-            Text(text = "User Profile Screen")
+            Text(text = "User Profile Information", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
         }
     }
 }

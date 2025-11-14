@@ -91,7 +91,7 @@ fun DashboardScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { /* Navigate to user profile */ }) {
+                        IconButton(onClick = { navController.navigate("user_profile_page") }) {
                             Icon(Icons.Filled.AccountCircle, contentDescription = "User Profile", modifier = Modifier.size(40.dp))
                         }
                     },
@@ -121,7 +121,7 @@ fun DashboardScreen(
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.HourglassTop, title = "Pending Verification", value = pendingVerification.toString(), onClick = { navController.navigate("pending_verification") })
-                    DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "20", onClick = { navController.navigate("available_beds") })
+                    DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "93", onClick = { navController.navigate("available_beds") })
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
