@@ -1,9 +1,11 @@
 package com.example.orphanapp.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,6 +20,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -36,6 +40,7 @@ import kotlinx.coroutines.launch
 fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var showForgotPasswordDialog by remember { mutableStateOf(false) }
     var passwordVisible by remember { mutableStateOf(false) }
     var userRole by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
@@ -46,10 +51,17 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     val scope = rememberCoroutineScope()
 
     LaunchedEffect(authState) {
-        (authState as? AuthState.Error)?.let {
+        if (authState is AuthState.Error) {
             scope.launch {
-                snackbarHostState.showSnackbar(it.message)
+                snackbarHostState.showSnackbar((authState as AuthState.Error).message)
             }
+        }
+    }
+
+    if (showForgotPasswordDialog) {
+        ForgotPasswordDialog(onDismiss = { showForgotPasswordDialog = false }) {
+            // Handle password reset logic here, e.g., call a method in AuthViewModel
+            showForgotPasswordDialog = false
         }
     }
 
@@ -140,17 +152,36 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
                         ) {
                             Text("Login", modifier = Modifier.padding(8.dp))
                         }
-                        TextButton(onClick = { /* Handle Forgot Password */ }) {
+                        TextButton(onClick = { showForgotPasswordDialog = true }) {
                             Text("Forgot Password?", color = MaterialTheme.colorScheme.secondary)
                         }
-                        TextButton(onClick = { navController.navigate("register") }) {
-                            Text("Don\'t have an account? Register")
+                        Row {
+                            Text("Don't have an account? ")
+                            ClickableText(
+                                text = AnnotatedString("Register"),
+                                onClick = { offset -> navController.navigate("register") },
+                                style = TextStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                            )
                         }
                     }
                 }
             }
         }
     }
+}
+
+@Composable
+fun ForgotPasswordDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Forgot Password") },
+        text = { Text("This functionality is not yet implemented.") },
+        confirmButton = {
+            Button(onClick = onConfirm) {
+                Text("OK")
+            }
+        }
+    )
 }
 
 @Preview(showBackground = true)

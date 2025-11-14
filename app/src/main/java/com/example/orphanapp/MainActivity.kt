@@ -26,6 +26,7 @@ import com.example.orphanapp.ui.LoginScreen
 import com.example.orphanapp.ui.OrphanProfileScreen
 import com.example.orphanapp.ui.PendingVerificationScreen
 import com.example.orphanapp.ui.PhotoGalleryScreen
+import com.example.orphanapp.ui.PrivacyPolicyScreen
 import com.example.orphanapp.ui.RegisterScreen
 import com.example.orphanapp.ui.ReportScreen
 import com.example.orphanapp.ui.SettingsScreen
@@ -136,6 +137,9 @@ fun OrphanageApp(
                 }
                 composable("communication") {
                     CommunicationScreen(navController)
+                }
+                composable("privacy_policy") {
+                    PrivacyPolicyScreen(navController)
                 }
             }
         }

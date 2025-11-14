@@ -35,6 +35,12 @@ fun EnrollmentScreen(
     var gender by remember { mutableStateOf("") }
     var guardianName by remember { mutableStateOf("") }
     var schoolName by remember { mutableStateOf("") }
+    var ageInRange by remember { mutableStateOf(false) }
+    var storySummaryProvided by remember { mutableStateOf(false) }
+    var healthInfoProvided by remember { mutableStateOf(false) }
+    var residentialProgram by remember { mutableStateOf(false) }
+    var orphanStatusProvided by remember { mutableStateOf(false) }
+    var photoInserted by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -76,8 +82,20 @@ fun EnrollmentScreen(
                         }
                         Spacer(modifier = Modifier.height(16.dp))
                         OutlinedTextField(value = guardianName, onValueChange = { guardianName = it }, label = { Text("Guardian Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
-                        Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedTextField(value = schoolName, onValueChange = { schoolName = it }, label = { Text("School Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                    }
+                }
+            }
+            item {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Checklist", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ChecklistItem(label = "Age between 1-18", checked = ageInRange, onCheckedChange = { ageInRange = it })
+                        ChecklistItem(label = "Summary of story provided", checked = storySummaryProvided, onCheckedChange = { storySummaryProvided = it })
+                        ChecklistItem(label = "Health information provided", checked = healthInfoProvided, onCheckedChange = { healthInfoProvided = it })
+                        ChecklistItem(label = "Residential Program Provided", checked = residentialProgram, onCheckedChange = { residentialProgram = it })
+                        ChecklistItem(label = "Orphan status provided", checked = orphanStatusProvided, onCheckedChange = { orphanStatusProvided = it })
+                        ChecklistItem(label = "Photo Inserted", checked = photoInserted, onCheckedChange = { photoInserted = it })
                     }
                 }
             }
@@ -89,7 +107,12 @@ fun EnrollmentScreen(
                         if (age.isBlank()) missingFields.add("Age")
                         if (gender.isBlank()) missingFields.add("Gender")
                         if (guardianName.isBlank()) missingFields.add("Guardian Name")
-                        if (schoolName.isBlank()) missingFields.add("School Name")
+                        if (!ageInRange) missingFields.add("Age between 1-18")
+                        if (!storySummaryProvided) missingFields.add("Summary of story")
+                        if (!healthInfoProvided) missingFields.add("Health information")
+                        if (!residentialProgram) missingFields.add("Residential Program")
+                        if (!orphanStatusProvided) missingFields.add("Orphan status")
+                        if (!photoInserted) missingFields.add("Photo")
 
                         if (missingFields.isNotEmpty()) {
                             scope.launch {
@@ -106,7 +129,7 @@ fun EnrollmentScreen(
                                 status = "Pending"
                             )
                             viewModel.addOrphan(newOrphan)
-                            onEnrollmentSuccess(newOrphan.id)
+                            navController.navigate("profile/${newOrphan.id}")
                         }
                     },
                     modifier = Modifier.fillMaxWidth()

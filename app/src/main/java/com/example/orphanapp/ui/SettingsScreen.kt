@@ -58,7 +58,7 @@ fun SettingsScreen(navController: NavController) {
                     Text("General", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                     SettingItem(label = "Enable Notifications", checked = notificationsEnabled, onCheckedChange = { notificationsEnabled = it })
-                    TextButton(onClick = { /* Handle Privacy Policy */ }) {
+                    TextButton(onClick = { navController.navigate("privacy_policy") }) {
                         Text("Privacy Policy", color = MaterialTheme.colorScheme.primary)
                     }
                 }
