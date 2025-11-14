@@ -14,6 +14,7 @@ sealed class AuthState {
     object Loading : AuthState()
     data class Authenticated(val user: User) : AuthState()
     object Unauthenticated : AuthState()
+    data class Error(val message: String) : AuthState()
 }
 
 class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
@@ -38,10 +39,12 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
                 val user = repository.signIn(email, password)
                 if (user != null) {
                     _authState.value = AuthState.Authenticated(user)
+                } else {
+                    _authState.value = AuthState.Error("Invalid credentials")
                 }
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Sign in failed", e)
-                _authState.value = AuthState.Unauthenticated
+                _authState.value = AuthState.Error(e.message ?: "Sign in failed")
             }
         }
     }
@@ -52,10 +55,12 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
                 val user = repository.register(email, password)
                 if (user != null) {
                     _authState.value = AuthState.Authenticated(user)
+                } else {
+                    _authState.value = AuthState.Error("Registration failed")
                 }
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Registration failed", e)
-                _authState.value = AuthState.Unauthenticated
+                _authState.value = AuthState.Error(e.message ?: "Registration failed")
             }
         }
     }

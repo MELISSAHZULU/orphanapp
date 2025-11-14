@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -43,7 +44,10 @@ fun EnrollmentScreen(
     var name by remember { mutableStateOf("") }
     var age by remember { mutableStateOf("") }
     var gender by remember { mutableStateOf("") }
+    var guardianName by remember { mutableStateOf("") }
+    var schoolName by remember { mutableStateOf("") }
     var birthCertificate by remember { mutableStateOf(false) }
+    var deathCertificate by remember { mutableStateOf(false) }
     var guardianConsent by remember { mutableStateOf(false) }
     var healthRecord by remember { mutableStateOf(false) }
     var ageInRange by remember { mutableStateOf(false) }
@@ -61,55 +65,71 @@ fun EnrollmentScreen(
             )
         }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Orphan Details", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
-                    Spacer(modifier = Modifier.height(16.dp))
-                    Text("Select Gender", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.fillMaxWidth())
-                    Row {
-                        ChecklistItem(label = "Male", checked = gender == "Male", onCheckedChange = { gender = "Male" })
-                        ChecklistItem(label = "Female", checked = gender == "Female", onCheckedChange = { gender = "Female" })
+            item {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Orphan Details", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        Text("Select Gender", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.fillMaxWidth())
+                        Row {
+                            ChecklistItem(label = "Male", checked = gender == "Male", onCheckedChange = { gender = "Male" })
+                            ChecklistItem(label = "Female", checked = gender == "Female", onCheckedChange = { gender = "Female" })
+                        }
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(value = guardianName, onValueChange = { guardianName = it }, label = { Text("Guardian Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(value = schoolName, onValueChange = { schoolName = it }, label = { Text("School Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
                     }
                 }
             }
-            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Documents", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    ChecklistItem(label = "Birth Certificate Provided", checked = birthCertificate, onCheckedChange = { birthCertificate = it })
-                    ChecklistItem(label = "Guardian Consent Form Provided", checked = guardianConsent, onCheckedChange = { guardianConsent = it })
-                    ChecklistItem(label = "Health Record Available", checked = healthRecord, onCheckedChange = { healthRecord = it })
-                    ChecklistItem(label = "Age within 1–18 years", checked = ageInRange, onCheckedChange = { ageInRange = it })
+            item {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Documents", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        ChecklistItem(label = "Birth Certificate Provided", checked = birthCertificate, onCheckedChange = { birthCertificate = it })
+                        ChecklistItem(label = "Death Certificate of Parent(s) Provided", checked = deathCertificate, onCheckedChange = { deathCertificate = it })
+                        ChecklistItem(label = "Guardian Consent Form Provided", checked = guardianConsent, onCheckedChange = { guardianConsent = it })
+                        ChecklistItem(label = "Health Record Available", checked = healthRecord, onCheckedChange = { healthRecord = it })
+                        ChecklistItem(label = "Age within 1–18 years", checked = ageInRange, onCheckedChange = { ageInRange = it })
+                    }
                 }
             }
-            Spacer(modifier = Modifier.weight(1f))
-            Button(
-                onClick = {
-                    val newOrphan = Orphan(
-                        id = (viewModel.orphans.value.size + 1),
-                        name = name,
-                        age = age.toIntOrNull() ?: 0,
-                        gender = gender,
-                        birthCertificate = birthCertificate,
-                        status = "Active"
-                    )
-                    viewModel.addOrphan(newOrphan)
-                    onEnrollmentSuccess(newOrphan.id!!)
-                },
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text("Enroll")
+            item {
+                Button(
+                    onClick = {
+                        val newOrphan = Orphan(
+                            id = (viewModel.orphans.value.size + 1),
+                            name = name,
+                            age = age.toIntOrNull() ?: 0,
+                            gender = gender,
+                            guardianName = guardianName,
+                            schoolName = schoolName,
+                            birthCertificate = birthCertificate,
+                            deathCertificate = deathCertificate,
+                            guardianConsent = guardianConsent,
+                            healthRecord = healthRecord,
+                            ageInRange = ageInRange,
+                            status = if(birthCertificate && deathCertificate && guardianConsent && healthRecord && ageInRange) "Active" else "Pending"
+                        )
+                        viewModel.addOrphan(newOrphan)
+                        onEnrollmentSuccess(newOrphan.id!!)
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Enroll")
+                }
             }
         }
     }

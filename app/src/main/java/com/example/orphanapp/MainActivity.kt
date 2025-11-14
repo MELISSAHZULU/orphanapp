@@ -71,9 +71,8 @@ fun OrphanageApp(
         }
         is AuthState.Authenticated -> {
             NavHost(navController = navController, startDestination = "dashboard") {
-                // Auth routes are not needed here as we are already authenticated
                 composable("dashboard") {
-                    DashboardScreen(navController, authViewModel)
+                    DashboardScreen(navController, authViewModel, orphanList)
                 }
                  composable("enrollment") {
                     EnrollmentScreen(navController, enrollmentViewModel) { newOrphanId ->
@@ -140,7 +139,7 @@ fun OrphanageApp(
                 }
             }
         }
-        is AuthState.Unauthenticated -> {
+        is AuthState.Unauthenticated, is AuthState.Error -> {
             NavHost(navController = navController, startDestination = "login") {
                 composable("login") {
                     LoginScreen(navController, authViewModel)

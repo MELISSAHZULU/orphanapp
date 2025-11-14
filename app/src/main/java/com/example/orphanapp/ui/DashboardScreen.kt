@@ -3,7 +3,6 @@ package com.example.orphanapp.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -53,6 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import com.example.orphanapp.R
+import com.example.orphanapp.model.Orphan
 import com.example.orphanapp.viewmodel.AuthState
 import com.example.orphanapp.viewmodel.AuthViewModel
 import kotlinx.coroutines.launch
@@ -60,9 +60,16 @@ import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) {
+fun DashboardScreen(
+    navController: NavController,
+    authViewModel: AuthViewModel,
+    orphans: List<Orphan>
+) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+    val totalOrphans = orphans.size
+    val pendingVerification = orphans.count { it.status != "Active" }
+    val recentAdmission = orphans.lastOrNull()
 
     ModalNavigationDrawer(
         drawerState = drawerState,
@@ -105,32 +112,18 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) 
                 Text("Dashboard", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    DashboardCard(icon = Icons.Filled.People, title = "Total Orphans Registered", value = "2,356", onClick = { navController.navigate("total_orphans") })
-                    DashboardCard(icon = Icons.Filled.CheckCircle, title = "Verified & Admitted", value = "1,980", onClick = { navController.navigate("verified_orphans") })
+                    DashboardCard(icon = Icons.Filled.People, title = "Total Orphans Registered", value = totalOrphans.toString(), onClick = { navController.navigate("total_orphans") })
+                    DashboardCard(icon = Icons.Filled.CheckCircle, title = "Verified & Admitted", value = (totalOrphans - pendingVerification).toString(), onClick = { navController.navigate("verified_orphans") })
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    DashboardCard(icon = Icons.Filled.HourglassTop, title = "Pending Verification", value = "150", onClick = { navController.navigate("pending_verification") })
+                    DashboardCard(icon = Icons.Filled.HourglassTop, title = "Pending Verification", value = pendingVerification.toString(), onClick = { navController.navigate("pending_verification") })
                     DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "20", onClick = { navController.navigate("available_beds") })
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.PhotoLibrary, title = "Photo Gallery", value = "", onClick = { navController.navigate("photo_gallery") })
-                    DashboardCard(icon = Icons.Filled.Assignment, title = "Activity Log", value = "", onClick = { navController.navigate("activity_log") })
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.Favorite, title = "Donations", value = "", onClick = { navController.navigate("donation") })
-                    DashboardCard(icon = Icons.Filled.BarChart, title = "Impact Reporting", value = "", onClick = { navController.navigate("impact_reporting") })
-                }
-                 Spacer(modifier = Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                    DashboardCard(icon = Icons.Filled.Inventory, title = "Inventory", value = "", onClick = { navController.navigate("inventory") })
-                    DashboardCard(icon = Icons.Filled.SupervisorAccount, title = "Staff Management", value = "", onClick = { navController.navigate("staff_management") })
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.Start) {
-                    DashboardCard(icon = Icons.AutoMirrored.Filled.Message, title = "Communication", value = "", onClick = { navController.navigate("communication") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(onClick = { navController.navigate("enrollment") }, modifier = Modifier.fillMaxWidth()) {
@@ -143,7 +136,18 @@ fun DashboardScreen(navController: NavController, authViewModel: AuthViewModel) 
                 Spacer(modifier = Modifier.height(24.dp))
                 Text("Recent Admissions", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
-                RecentAdmissionItem(navController = navController, id = 1, name = "Elena Khumbo", age = 5, home = "Melissahh Zulu Tsalima wa's Home", imageUrl = R.drawable.ic_launcher_background)
+                if (recentAdmission != null) {
+                    RecentAdmissionItem(
+                        navController = navController,
+                        id = recentAdmission.id,
+                        name = recentAdmission.name,
+                        age = recentAdmission.age,
+                        home = recentAdmission.guardianName,
+                        imageUrl = R.drawable.ic_launcher_background // Replace with actual image if available
+                    )
+                } else {
+                    Text("No recent admissions")
+                }
             }
         }
     }
@@ -188,10 +192,12 @@ fun AppDrawer(
             // Menu Items
             Column(modifier = Modifier.verticalScroll(scrollState)) {
                 DrawerItem(icon = Icons.Filled.Home, text = "Home", onClick = { navController.navigate("dashboard"); closeDrawer() })
-                DrawerItem(icon = Icons.Filled.PersonAdd, text = "Enrollment", onClick = { navController.navigate("enrollment"); closeDrawer() })
-                DrawerItem(icon = Icons.Filled.LocationOn, text = "Tracking", onClick = { navController.navigate("tracking"); closeDrawer() })
-                DrawerItem(icon = Icons.Filled.Favorite, text = "Donations", onClick = { navController.navigate("donation"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.Inventory, text = "Inventory", onClick = { navController.navigate("inventory"); closeDrawer() })
                 DrawerItem(icon = Icons.Filled.Assessment, text = "Reports", onClick = { navController.navigate("report"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.Assignment, text = "Activity Log", onClick = { navController.navigate("activity_log"); closeDrawer() })
+                DrawerItem(icon = Icons.AutoMirrored.Filled.Message, text = "Communication", onClick = { navController.navigate("communication"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.BarChart, text = "Impact Reporting", onClick = { navController.navigate("impact_reporting"); closeDrawer() })
+                DrawerItem(icon = Icons.Filled.SupervisorAccount, text = "Staff Management", onClick = { navController.navigate("staff_management"); closeDrawer() })
                 DrawerItem(icon = Icons.Filled.Settings, text = "Settings", onClick = { navController.navigate("settings"); closeDrawer() })
             }
             Spacer(modifier = Modifier.weight(1f))

@@ -21,15 +21,15 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.orphanapp.repository.FakeAuthRepository
 import com.example.orphanapp.ui.theme.OrphanAppTheme
+import com.example.orphanapp.viewmodel.AuthState
 import com.example.orphanapp.viewmodel.AuthViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -41,94 +41,111 @@ fun LoginScreen(navController: NavController, authViewModel: AuthViewModel) {
     var expanded by remember { mutableStateOf(false) }
     val roles = listOf("Village Head", "Health Worker", "Orphanage Staff", "Admin")
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        MaterialTheme.colorScheme.primary,
-                        MaterialTheme.colorScheme.secondary
+    val authState by authViewModel.authState.collectAsState()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(authState) {
+        (authState as? AuthState.Error)?.let {
+            scope.launch {
+                snackbarHostState.showSnackbar(it.message)
+            }
+        }
+    }
+
+    Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colors = listOf(
+                            MaterialTheme.colorScheme.primary,
+                            MaterialTheme.colorScheme.secondary
+                        )
                     )
                 )
-            )
-            .padding(16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(16.dp),
+            contentAlignment = Alignment.Center
         ) {
-            AppLogo()
-            Spacer(modifier = Modifier.height(32.dp))
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
             ) {
-                Column(
-                    modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                AppLogo()
+                Spacer(modifier = Modifier.height(32.dp))
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(16.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
                 ) {
-                    OutlinedTextField(
-                        value = username,
-                        onValueChange = { username = it },
-                        label = { Text("Username / Email") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(24.dp)
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    OutlinedTextField(
-                        value = password,
-                        onValueChange = { password = it },
-                        label = { Text("Password") },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(24.dp),
-                        visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                        trailingIcon = {
-                            val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
-                            IconButton(onClick = { passwordVisible = !passwordVisible }) {
-                                Icon(image, "toggle password visibility")
+                    Column(
+                        modifier = Modifier.padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        OutlinedTextField(
+                            value = username,
+                            onValueChange = { username = it },
+                            label = { Text("Username / Email") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(
+                            value = password,
+                            onValueChange = { password = it },
+                            label = { Text("Password") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp),
+                            visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                            trailingIcon = {
+                                val image = if (passwordVisible) Icons.Filled.Visibility else Icons.Filled.VisibilityOff
+                                IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                                    Icon(image, "toggle password visibility")
+                                }
                             }
-                        }
-                    )
-                    Spacer(modifier = Modifier.height(16.dp))
-                    if (roles.isNotEmpty()) {
-                        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                            OutlinedTextField(
-                                value = userRole,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("User Role") },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(),
-                                shape = RoundedCornerShape(24.dp)
-                            )
-                            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                                roles.forEach { role ->
-                                    DropdownMenuItem(text = { Text(role) }, onClick = {
-                                        userRole = role
-                                        expanded = false
-                                    })
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        if (roles.isNotEmpty()) {
+                            ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                                OutlinedTextField(
+                                    value = userRole,
+                                    onValueChange = {},
+                                    readOnly = true,
+                                    label = { Text("User Role") },
+                                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .menuAnchor(),
+                                    shape = RoundedCornerShape(24.dp)
+                                )
+                                ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                                    roles.forEach { role ->
+                                        DropdownMenuItem(text = { Text(role) }, onClick = {
+                                            userRole = role
+                                            expanded = false
+                                        })
+                                    }
                                 }
                             }
                         }
-                    }
-                    Spacer(modifier = Modifier.height(24.dp))
-                    Button(
-                        onClick = { authViewModel.signIn(username, password) },
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(24.dp)
-                    ) {
-                        Text("Login", modifier = Modifier.padding(8.dp))
-                    }
-                    TextButton(onClick = { /* Handle Forgot Password */ }) {
-                        Text("Forgot Password?", color = MaterialTheme.colorScheme.secondary)
-                    }
-                    TextButton(onClick = { navController.navigate("register") }) {
-                        Text("Don't have an account? Register")
+                        Spacer(modifier = Modifier.height(24.dp))
+                        Button(
+                            onClick = { authViewModel.signIn(username, password) },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp)
+                        ) {
+                            Text("Login", modifier = Modifier.padding(8.dp))
+                        }
+                        TextButton(onClick = { /* Handle Forgot Password */ }) {
+                            Text("Forgot Password?", color = MaterialTheme.colorScheme.secondary)
+                        }
+                        TextButton(onClick = { navController.navigate("register") }) {
+                            Text("Don\'t have an account? Register")
+                        }
                     }
                 }
             }
