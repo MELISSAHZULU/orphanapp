@@ -137,14 +137,16 @@ fun DashboardScreen(
                 Text("Recent Admissions", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
                 if (recentAdmission != null) {
-                    RecentAdmissionItem(
-                        navController = navController,
-                        id = recentAdmission.id,
-                        name = recentAdmission.name,
-                        age = recentAdmission.age,
-                        home = recentAdmission.guardianName,
-                        imageUrl = R.drawable.ic_launcher_background // Replace with actual image if available
-                    )
+                    recentAdmission.id?.let {
+                        RecentAdmissionItem(
+                            navController = navController,
+                            id = it,
+                            name = recentAdmission.name,
+                            age = recentAdmission.age,
+                            home = recentAdmission.guardianName,
+                            imageUrl = R.drawable.ic_launcher_background // Replace with actual image if available
+                        )
+                    }
                 } else {
                     Text("No recent admissions")
                 }

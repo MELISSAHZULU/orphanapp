@@ -40,6 +40,11 @@ fun EnrollmentScreen(
     var guardianConsent by remember { mutableStateOf(false) }
     var healthRecord by remember { mutableStateOf(false) }
     var ageInRange by remember { mutableStateOf(false) }
+    var recommendation by remember { mutableStateOf(false) }
+    var reasonForAdmission by remember { mutableStateOf(false) }
+    var orphanStatusProvided by remember { mutableStateOf(false) }
+    var healthInfoProvided by remember { mutableStateOf(false) }
+    var storySummaryProvided by remember { mutableStateOf(false) }
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
@@ -89,13 +94,19 @@ fun EnrollmentScreen(
             item {
                 Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Documents", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("Documents & Checklist", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
+                        ChecklistItem(label = "Age between 1-18", checked = ageInRange, onCheckedChange = { ageInRange = it })
+                        ChecklistItem(label = "Recommendation for appropriate program selected", checked = recommendation, onCheckedChange = { recommendation = it })
+                        ChecklistItem(label = "Reason of admission provided", checked = reasonForAdmission, onCheckedChange = { reasonForAdmission = it })
+                        ChecklistItem(label = "Orphan status provided", checked = orphanStatusProvided, onCheckedChange = { orphanStatusProvided = it })
+                        ChecklistItem(label = "Health information provided", checked = healthInfoProvided, onCheckedChange = { healthInfoProvided = it })
+                        ChecklistItem(label = "Summary of the story provided", checked = storySummaryProvided, onCheckedChange = { storySummaryProvided = it })
                         ChecklistItem(label = "Birth Certificate Provided", checked = birthCertificate, onCheckedChange = { birthCertificate = it })
                         ChecklistItem(label = "Death Certificate of Parent(s) Provided", checked = deathCertificate, onCheckedChange = { deathCertificate = it })
                         ChecklistItem(label = "Guardian Consent Form Provided", checked = guardianConsent, onCheckedChange = { guardianConsent = it })
                         ChecklistItem(label = "Health Record Available", checked = healthRecord, onCheckedChange = { healthRecord = it })
-                        ChecklistItem(label = "Age within 1–18 years", checked = ageInRange, onCheckedChange = { ageInRange = it })
+
                     }
                 }
             }
@@ -108,11 +119,17 @@ fun EnrollmentScreen(
                         if (gender.isBlank()) missingFields.add("Gender")
                         if (guardianName.isBlank()) missingFields.add("Guardian Name")
                         if (schoolName.isBlank()) missingFields.add("School Name")
+                        if (!ageInRange) missingFields.add("Age between 1-18")
+                        if (!recommendation) missingFields.add("Recommendation for program")
+                        if (!reasonForAdmission) missingFields.add("Reason for admission")
+                        if (!orphanStatusProvided) missingFields.add("Orphan status")
+                        if (!healthInfoProvided) missingFields.add("Health information")
+                        if (!storySummaryProvided) missingFields.add("Summary of story")
                         if (!birthCertificate) missingFields.add("Birth Certificate")
                         if (!deathCertificate) missingFields.add("Death Certificate")
                         if (!guardianConsent) missingFields.add("Guardian Consent")
                         if (!healthRecord) missingFields.add("Health Record")
-                        if (!ageInRange) missingFields.add("Age in Range")
+
 
                         if (missingFields.isNotEmpty()) {
                             scope.launch {
