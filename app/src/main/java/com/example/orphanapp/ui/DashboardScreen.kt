@@ -126,7 +126,7 @@ fun DashboardScreen(
                     DashboardCard(icon = Icons.Filled.Favorite, title = "Donations", value = "", onClick = { navController.navigate("donation") })
                 }
                 Spacer(modifier = Modifier.height(24.dp))
-                Button(onClick = { navController.navigate("enrollment") }, modifier = Modifier.fillMaxWidth()) {
+                Button(onClick = { navController.navigate("checklist") }, modifier = Modifier.fillMaxWidth()) {
                     Text("Register New Orphan")
                 }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -137,16 +137,14 @@ fun DashboardScreen(
                 Text("Recent Admissions", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
                 Spacer(modifier = Modifier.height(16.dp))
                 if (recentAdmission != null) {
-                    recentAdmission.id?.let {
-                        RecentAdmissionItem(
-                            navController = navController,
-                            id = it,
-                            name = recentAdmission.name,
-                            age = recentAdmission.age,
-                            home = recentAdmission.guardianName,
-                            imageUrl = R.drawable.ic_launcher_background // Replace with actual image if available
-                        )
-                    }
+                    RecentAdmissionItem(
+                        navController = navController,
+                        id = recentAdmission.id,
+                        name = recentAdmission.name,
+                        age = recentAdmission.age,
+                        home = recentAdmission.guardianName,
+                        imageUrl = R.drawable.ic_launcher_background // Replace with actual image if available
+                    )
                 } else {
                     Text("No recent admissions")
                 }

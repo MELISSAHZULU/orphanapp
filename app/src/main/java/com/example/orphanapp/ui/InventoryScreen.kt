@@ -41,6 +41,7 @@ fun InventoryScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text("Inventory & Resource Management", style = MaterialTheme.typography.headlineSmall)

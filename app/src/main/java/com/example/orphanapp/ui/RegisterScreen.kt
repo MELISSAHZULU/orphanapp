@@ -27,6 +27,10 @@ import kotlinx.coroutines.launch
 fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
+    var userRole by remember { mutableStateOf("") }
+    var expanded by remember { mutableStateOf(false) }
+    val roles = listOf("Village Head", "Health Worker", "Orphanage Staff", "Admin")
 
     val authState by authViewModel.authState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -72,6 +76,14 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                 ) {
                     Column(modifier = Modifier.padding(24.dp)) {
                         OutlinedTextField(
+                            value = username,
+                            onValueChange = { username = it },
+                            label = { Text("Username") },
+                            modifier = Modifier.fillMaxWidth(),
+                            shape = RoundedCornerShape(24.dp)
+                        )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(
                             value = email,
                             onValueChange = { email = it },
                             label = { Text("Email") },
@@ -79,7 +91,6 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                             shape = RoundedCornerShape(24.dp)
                         )
                         Spacer(modifier = Modifier.height(16.dp))
-
                         OutlinedTextField(
                             value = password,
                             onValueChange = { password = it },
@@ -88,6 +99,28 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                             visualTransformation = PasswordVisualTransformation(),
                             shape = RoundedCornerShape(24.dp)
                         )
+                        Spacer(modifier = Modifier.height(16.dp))
+                        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+                            OutlinedTextField(
+                                value = userRole,
+                                onValueChange = {},
+                                readOnly = true,
+                                label = { Text("User Role") },
+                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .menuAnchor(),
+                                shape = RoundedCornerShape(24.dp)
+                            )
+                            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
+                                roles.forEach { role ->
+                                    DropdownMenuItem(text = { Text(role) }, onClick = {
+                                        userRole = role
+                                        expanded = false
+                                    })
+                                }
+                            }
+                        }
                         Spacer(modifier = Modifier.height(32.dp))
 
                         Button(

@@ -37,6 +37,7 @@ fun ImpactReportingScreen(navController: NavController) {
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .background(MaterialTheme.colorScheme.background)
             .padding(16.dp)
     ) {
         Text("Impact Reporting", style = MaterialTheme.typography.headlineSmall)
