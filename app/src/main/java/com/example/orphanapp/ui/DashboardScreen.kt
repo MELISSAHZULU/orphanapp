@@ -90,6 +90,11 @@ fun DashboardScreen(
                             Icon(Icons.Filled.Menu, contentDescription = "Menu", modifier = Modifier.size(40.dp))
                         }
                     },
+                    actions = {
+                        IconButton(onClick = { /* Navigate to user profile */ }) {
+                            Icon(Icons.Filled.AccountCircle, contentDescription = "User Profile", modifier = Modifier.size(40.dp))
+                        }
+                    },
                     colors = TopAppBarDefaults.topAppBarColors(
                         containerColor = MaterialTheme.colorScheme.primary,
                         titleContentColor = MaterialTheme.colorScheme.onPrimary,

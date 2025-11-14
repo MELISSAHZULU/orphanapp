@@ -11,29 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.*
-import com.example.orphanapp.ui.AboutScreen
-import com.example.orphanapp.ui.ActivityLogScreen
-import com.example.orphanapp.ui.AvailableBedsScreen
-import com.example.orphanapp.ui.ChecklistScreen
-import com.example.orphanapp.ui.CommunicationScreen
-import com.example.orphanapp.ui.DashboardScreen
-import com.example.orphanapp.ui.DonationScreen
-import com.example.orphanapp.ui.EnrollmentScreen
-import com.example.orphanapp.ui.HelpScreen
-import com.example.orphanapp.ui.ImpactReportingScreen
-import com.example.orphanapp.ui.InventoryScreen
-import com.example.orphanapp.ui.LoginScreen
-import com.example.orphanapp.ui.OrphanProfileScreen
-import com.example.orphanapp.ui.PendingVerificationScreen
-import com.example.orphanapp.ui.PhotoGalleryScreen
-import com.example.orphanapp.ui.PrivacyPolicyScreen
-import com.example.orphanapp.ui.RegisterScreen
-import com.example.orphanapp.ui.ReportScreen
-import com.example.orphanapp.ui.SettingsScreen
-import com.example.orphanapp.ui.StaffManagementScreen
-import com.example.orphanapp.ui.TotalOrphansScreen
-import com.example.orphanapp.ui.TrackingScreen
-import com.example.orphanapp.ui.VerifiedOrphansScreen
+import com.example.orphanapp.ui.*
 import com.example.orphanapp.ui.theme.OrphanAppTheme
 import com.example.orphanapp.viewmodel.AuthState
 import com.example.orphanapp.viewmodel.AuthViewModel
@@ -75,7 +53,7 @@ fun OrphanageApp(
                 composable("dashboard") {
                     DashboardScreen(navController, authViewModel, orphanList)
                 }
-                 composable("enrollment") {
+                composable("enrollment") {
                     EnrollmentScreen(navController, enrollmentViewModel) { newOrphanId ->
                         navController.navigate("profile/$newOrphanId")
                     }
@@ -140,6 +118,9 @@ fun OrphanageApp(
                 }
                 composable("privacy_policy") {
                     PrivacyPolicyScreen(navController)
+                }
+                composable("user_profile") {
+                    UserProfileScreen(navController)
                 }
             }
         }

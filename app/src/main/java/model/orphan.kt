@@ -27,5 +27,11 @@ data class Orphan(
     var status: String = "Active",
     val photoUrl: String? = null,
     val guardians: MutableList<Guardian> = mutableListOf(),
-    val activityLogs: MutableList<ActivityLog> = mutableListOf()
+    val activityLogs: MutableList<ActivityLog> = mutableListOf(),
+    val ageInRange: Boolean = false,
+    val storySummaryProvided: Boolean = false,
+    val healthInfoProvided: Boolean = false,
+    val residentialProgram: Boolean = false,
+    val orphanStatusProvided: Boolean = false,
+    val photoInserted: Boolean = false
 )
