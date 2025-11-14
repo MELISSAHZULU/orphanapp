@@ -131,11 +131,13 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                             Text("Save")
                         }
                     } else {
-                        Button(onClick = {
-                            val updatedOrphan = orphan.copy(status = "Updated")
-                            onUpdate(updatedOrphan)
-                        }) {
-                            Text("Update Status")
+                        if (orphan.status == "Pending") {
+                            Button(onClick = {
+                                val updatedOrphan = orphan.copy(status = "Active")
+                                onUpdate(updatedOrphan)
+                            }) {
+                                Text("Verify")
+                            }
                         }
                     }
                     OutlinedButton(onClick = { navController.navigate("tracking") }) {
