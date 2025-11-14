@@ -37,10 +37,10 @@ import com.example.orphanapp.model.Orphan
 @Composable
 fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate: (Orphan) -> Unit) {
     var isEditing by remember { mutableStateOf(false) }
-    var name by remember { mutableStateOf(orphan?.name ?: "") }
-    var age by remember { mutableStateOf(orphan?.age?.toString() ?: "") }
-    var gender by remember { mutableStateOf(orphan?.gender ?: "") }
-    var status by remember { mutableStateOf(orphan?.status ?: "") }
+    var name by remember(orphan) { mutableStateOf(orphan?.name ?: "") }
+    var age by remember(orphan) { mutableStateOf(orphan?.age?.toString() ?: "") }
+    var gender by remember(orphan) { mutableStateOf(orphan?.gender ?: "") }
+    var status by remember(orphan) { mutableStateOf(orphan?.status ?: "") }
 
     Scaffold(
         topBar = {
@@ -91,11 +91,11 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                             OutlinedTextField(value = gender, onValueChange = { gender = it }, label = { Text("Gender") })
                             OutlinedTextField(value = status, onValueChange = { status = it }, label = { Text("Status") })
                         } else {
-                            Text("Name: $name", style = MaterialTheme.typography.bodyLarge)
-                            Text("Age: $age", style = MaterialTheme.typography.bodyLarge)
-                            Text("Gender: $gender", style = MaterialTheme.typography.bodyLarge)
+                            Text("Name: ${orphan.name}", style = MaterialTheme.typography.bodyLarge)
+                            Text("Age: ${orphan.age}", style = MaterialTheme.typography.bodyLarge)
+                            Text("Gender: ${orphan.gender}", style = MaterialTheme.typography.bodyLarge)
                             Text("Enrollment Date: 2025-10-10", style = MaterialTheme.typography.bodyLarge) // Placeholder
-                            Text("Status: $status", style = MaterialTheme.typography.bodyLarge)
+                            Text("Status: ${orphan.status}", style = MaterialTheme.typography.bodyLarge)
                         }
                     }
                 }

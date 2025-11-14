@@ -136,18 +136,11 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                             Text("Register", modifier = Modifier.padding(8.dp))
                         }
                         Spacer(modifier = Modifier.height(8.dp))
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text("Already have an account? ")
-                            ClickableText(
-                                text = AnnotatedString("Login"),
-                                onClick = { offset -> navController.navigate("login") },
-                                style = TextStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
-                            )
-                        }
+                        ClickableText(
+                            text = AnnotatedString("Login"),
+                            onClick = { offset -> navController.navigate("login") },
+                            style = TextStyle(color = MaterialTheme.colorScheme.primary, fontWeight = FontWeight.Bold)
+                        )
                     }
                 }
             }

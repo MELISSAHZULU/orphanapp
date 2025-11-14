@@ -109,8 +109,6 @@ fun DashboardScreen(
                     .padding(16.dp)
                     .verticalScroll(scrollState)
             ) {
-                Text("Dashboard", style = MaterialTheme.typography.headlineSmall, fontWeight = FontWeight.Bold)
-                Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.People, title = "Total Orphans Registered", value = totalOrphans.toString(), onClick = { navController.navigate("total_orphans") })
                     DashboardCard(icon = Icons.Filled.CheckCircle, title = "Verified & Admitted", value = (totalOrphans - pendingVerification).toString(), onClick = { navController.navigate("verified_orphans") })
