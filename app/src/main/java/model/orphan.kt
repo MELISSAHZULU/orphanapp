@@ -18,11 +18,17 @@ data class Guardian(
 
 data class Orphan(
     @DocumentId val documentId: String = "",
-    val id: Int? = null,
+    val id: Int = 0,
     val name: String = "",
     val age: Int = 0,
     val gender: String = "",
+    val guardianName: String = "",
+    val schoolName: String = "",
     val birthCertificate: Boolean = false,
+    val deathCertificate: Boolean = false,
+    val guardianConsent: Boolean = false,
+    val healthRecord: Boolean = false,
+    val ageInRange: Boolean = false,
     var status: String = "Active",
     val photoUrl: String? = null,
     val guardians: MutableList<Guardian> = mutableListOf(),

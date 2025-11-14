@@ -12,19 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -33,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.orphanapp.model.Orphan
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,7 +41,11 @@ fun EnrollmentScreen(
     var healthRecord by remember { mutableStateOf(false) }
     var ageInRange by remember { mutableStateOf(false) }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
                 title = { Text("Enrollment") },
@@ -109,22 +102,40 @@ fun EnrollmentScreen(
             item {
                 Button(
                     onClick = {
-                        val newOrphan = Orphan(
-                            id = (viewModel.orphans.value.size + 1),
-                            name = name,
-                            age = age.toIntOrNull() ?: 0,
-                            gender = gender,
-                            guardianName = guardianName,
-                            schoolName = schoolName,
-                            birthCertificate = birthCertificate,
-                            deathCertificate = deathCertificate,
-                            guardianConsent = guardianConsent,
-                            healthRecord = healthRecord,
-                            ageInRange = ageInRange,
-                            status = if(birthCertificate && deathCertificate && guardianConsent && healthRecord && ageInRange) "Active" else "Pending"
-                        )
-                        viewModel.addOrphan(newOrphan)
-                        onEnrollmentSuccess(newOrphan.id!!)
+                        val missingFields = mutableListOf<String>()
+                        if (name.isBlank()) missingFields.add("Name")
+                        if (age.isBlank()) missingFields.add("Age")
+                        if (gender.isBlank()) missingFields.add("Gender")
+                        if (guardianName.isBlank()) missingFields.add("Guardian Name")
+                        if (schoolName.isBlank()) missingFields.add("School Name")
+                        if (!birthCertificate) missingFields.add("Birth Certificate")
+                        if (!deathCertificate) missingFields.add("Death Certificate")
+                        if (!guardianConsent) missingFields.add("Guardian Consent")
+                        if (!healthRecord) missingFields.add("Health Record")
+                        if (!ageInRange) missingFields.add("Age in Range")
+
+                        if (missingFields.isNotEmpty()) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar("Enrollment Unsuccessful: Please provide ${missingFields.joinToString()}")
+                            }
+                        } else {
+                            val newOrphan = Orphan(
+                                id = (viewModel.orphans.value.size + 1),
+                                name = name,
+                                age = age.toInt(),
+                                gender = gender,
+                                guardianName = guardianName,
+                                schoolName = schoolName,
+                                birthCertificate = birthCertificate,
+                                deathCertificate = deathCertificate,
+                                guardianConsent = guardianConsent,
+                                healthRecord = healthRecord,
+                                ageInRange = ageInRange,
+                                status = "Active"
+                            )
+                            viewModel.addOrphan(newOrphan)
+                            onEnrollmentSuccess(newOrphan.id!!)
+                        }
                     },
                     modifier = Modifier.fillMaxWidth()
                 ) {
