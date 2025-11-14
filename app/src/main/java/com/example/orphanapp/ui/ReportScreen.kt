@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
@@ -33,6 +34,8 @@ fun ReportScreen(navController: NavController, orphanList: List<Orphan>) {
     val verifiedOrphans = orphanList.count { it.status == "Active" }
     val pendingVerification = totalOrphans - verifiedOrphans
     val availableBeds = 20 // Placeholder
+    val inventoryItems = listOf("Rice", "T-shirts", "Notebooks", "Soap") // Placeholder
+    val activityLog = listOf("John Doe visited the orphanage.", "New donation of clothes received.") // Placeholder
 
     Scaffold(
         topBar = {
@@ -47,27 +50,53 @@ fun ReportScreen(navController: NavController, orphanList: List<Orphan>) {
             )
         }
     ) { padding ->
-        Column(
+        LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background)
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Orphan Statistics", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Total Orphans: $totalOrphans")
-                    Text("Verified & Admitted: $verifiedOrphans")
-                    Text("Pending Verification: $pendingVerification")
+            item {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Orphan Statistics", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Total Orphans: $totalOrphans")
+                        Text("Verified & Admitted: $verifiedOrphans")
+                        Text("Pending Verification: $pendingVerification")
+                    }
                 }
             }
-            Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                Column(modifier = Modifier.padding(16.dp)) {
-                    Text("Bed Occupancy", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text("Available Beds: $availableBeds")
+            item {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Bed Occupancy", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text("Available Beds: $availableBeds")
+                    }
+                }
+            }
+            item {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Inventory Summary", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        inventoryItems.forEach { item ->
+                            Text(item)
+                        }
+                    }
+                }
+            }
+            item {
+                Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Recent Activity", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        activityLog.forEach { log ->
+                            Text(log)
+                        }
+                    }
                 }
             }
         }
