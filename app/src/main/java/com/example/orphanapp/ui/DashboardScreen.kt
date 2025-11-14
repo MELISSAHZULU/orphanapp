@@ -68,7 +68,10 @@ fun DashboardScreen(
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val totalOrphans = orphans.size
-    val pendingVerification = orphans.count { it.status != "Active" }
+    val activeOrphans = orphans.count { it.status == "Active" }
+    val pendingVerification = totalOrphans - activeOrphans
+    val totalBeds = 100
+    val availableBeds = totalBeds - activeOrphans
     val recentAdmission = orphans.lastOrNull()
 
     ModalNavigationDrawer(
@@ -91,7 +94,7 @@ fun DashboardScreen(
                         }
                     },
                     actions = {
-                        IconButton(onClick = { navController.navigate("user_profile_page") }) {
+                        IconButton(onClick = { navController.navigate("user_profile") }) {
                             Icon(Icons.Filled.AccountCircle, contentDescription = "User Profile", modifier = Modifier.size(40.dp))
                         }
                     },
@@ -116,12 +119,12 @@ fun DashboardScreen(
             ) {
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.People, title = "Total Orphans Registered", value = totalOrphans.toString(), onClick = { navController.navigate("total_orphans") })
-                    DashboardCard(icon = Icons.Filled.CheckCircle, title = "Verified & Admitted", value = (totalOrphans - pendingVerification).toString(), onClick = { navController.navigate("verified_orphans") })
+                    DashboardCard(icon = Icons.Filled.CheckCircle, title = "Verified & Admitted", value = activeOrphans.toString(), onClick = { navController.navigate("verified_orphans") })
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
                     DashboardCard(icon = Icons.Filled.HourglassTop, title = "Pending Verification", value = pendingVerification.toString(), onClick = { navController.navigate("pending_verification") })
-                    DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = "93", onClick = { navController.navigate("available_beds") })
+                    DashboardCard(icon = Icons.Filled.Bed, title = "Available Beds", value = availableBeds.toString(), onClick = { navController.navigate("available_beds") })
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
@@ -176,6 +179,7 @@ fun AppDrawer(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .clickable { navController.navigate("user_profile"); closeDrawer() }
                     .padding(16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
@@ -196,7 +200,6 @@ fun AppDrawer(
             Column(modifier = Modifier.verticalScroll(scrollState)) {
                 DrawerItem(icon = Icons.Filled.Home, text = "Home", onClick = { navController.navigate("dashboard"); closeDrawer() })
                 DrawerItem(icon = Icons.Filled.Inventory, text = "Inventory", onClick = { navController.navigate("inventory"); closeDrawer() })
-                DrawerItem(icon = Icons.Filled.Assessment, text = "Reports", onClick = { navController.navigate("report"); closeDrawer() })
                 DrawerItem(icon = Icons.Filled.Assignment, text = "Activity Log", onClick = { navController.navigate("activity_log"); closeDrawer() })
                 DrawerItem(icon = Icons.AutoMirrored.Filled.Message, text = "Communication", onClick = { navController.navigate("communication"); closeDrawer() })
                 DrawerItem(icon = Icons.Filled.BarChart, text = "Impact Reporting", onClick = { navController.navigate("impact_reporting"); closeDrawer() })

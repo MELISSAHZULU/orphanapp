@@ -1,6 +1,7 @@
 package com.example.orphanapp.ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
 data class InventoryItem(
+    val id: Int,
     val name: String,
     val category: String,
     val status: String,
@@ -45,13 +47,13 @@ fun InventoryScreen(navController: NavController) {
 
     val categories = listOf("Food", "Clothes", "Medicine", "Cleaning")
     val allItems = listOf(
-        InventoryItem("Rice", "Food", "Low", "2 kg", Icons.Default.Restaurant),
-        InventoryItem("Sweets", "Food", "In stock", "30 units", Icons.Default.Cake),
-        InventoryItem("T-shirts", "Clothes", "In stock", "50 units", Icons.Default.Checkroom),
-        InventoryItem("Bread", "Food", "Suboptimal", "7 loaves", Icons.Default.BakeryDining),
-        InventoryItem("Aspirin", "Medicine", "Low", "10 units", Icons.Default.MedicalServices),
-        InventoryItem("Vegetables", "Food", "In stock", "10 kg", Icons.Default.Grass),
-        InventoryItem("Soap", "Cleaning", "In stock", "100 units", Icons.Default.CleanHands)
+        InventoryItem(1, "Rice", "Food", "Out of stock", "0 kg", Icons.Default.Restaurant),
+        InventoryItem(2, "Sweets", "Food", "Out of stock", "0 units", Icons.Default.Cake),
+        InventoryItem(3, "T-shirts", "Clothes", "Out of stock", "0 units", Icons.Default.Checkroom),
+        InventoryItem(4, "Bread", "Food", "Out of stock", "0 loaves", Icons.Default.BakeryDining),
+        InventoryItem(5, "Aspirin", "Medicine", "Out of stock", "0 units", Icons.Default.MedicalServices),
+        InventoryItem(6, "Vegetables", "Food", "Out of stock", "0 kg", Icons.Default.Grass),
+        InventoryItem(7, "Soap", "Cleaning", "Out of stock", "0 units", Icons.Default.CleanHands)
     )
 
     val filteredItems = allItems.filter { it.category == selectedCategory && it.name.contains(searchQuery, ignoreCase = true) }
@@ -60,15 +62,15 @@ fun InventoryScreen(navController: NavController) {
         topBar = {
             TopAppBar(
                 title = { Text("Inventory", fontWeight = FontWeight.Bold, fontSize = 28.sp) },
-                actions = {
-                    IconButton(onClick = { /* TODO: Search action */ }) {
-                        Icon(Icons.Default.Search, contentDescription = "Search", modifier = Modifier.size(28.dp))
-                    }
-                },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.background
                 )
             )
+        },
+        floatingActionButton = {
+            FloatingActionButton(onClick = { navController.navigate("add_edit_inventory_item") }) {
+                Icon(Icons.Default.Add, contentDescription = "Add Item")
+            }
         },
         containerColor = MaterialTheme.colorScheme.background
     ) { padding ->
@@ -103,7 +105,9 @@ fun InventoryScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(16.dp))
             LazyColumn(verticalArrangement = Arrangement.spacedBy(12.dp)) {
                 items(filteredItems) { item ->
-                    InventoryListItem(item)
+                    InventoryListItem(item = item) {
+                        navController.navigate("add_edit_inventory_item/${item.id}")
+                    }
                 }
             }
         }
@@ -112,9 +116,11 @@ fun InventoryScreen(navController: NavController) {
 
 
 @Composable
-fun InventoryListItem(item: InventoryItem) {
+fun InventoryListItem(item: InventoryItem, onClick: () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)

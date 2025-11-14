@@ -25,10 +25,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.orphanapp.model.Orphan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AvailableBedsScreen(navController: NavController) {
+fun AvailableBedsScreen(navController: NavController, orphanList: List<Orphan>) {
+    val totalBeds = 100
+    val occupiedBeds = orphanList.count { it.status == "Active" }
+    val availableBeds = totalBeds - occupiedBeds
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -49,9 +54,9 @@ fun AvailableBedsScreen(navController: NavController) {
                 .padding(16.dp)
         ) {
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceAround) {
-                BedInfoCard(title = "Total Beds", value = "100")
-                BedInfoCard(title = "Occupied Beds", value = "7")
-                BedInfoCard(title = "Available Beds", value = "93")
+                BedInfoCard(title = "Total Beds", value = totalBeds.toString())
+                BedInfoCard(title = "Occupied Beds", value = occupiedBeds.toString())
+                BedInfoCard(title = "Available Beds", value = availableBeds.toString())
             }
         }
     }

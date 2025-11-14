@@ -90,7 +90,7 @@ fun OrphanageApp(
                     PendingVerificationScreen(navController, orphanList.filter { it.status != "Active" })
                 }
                 composable("available_beds") {
-                    AvailableBedsScreen(navController)
+                    AvailableBedsScreen(navController, orphanList)
                 }
                 composable("report") {
                     ReportScreen(navController, orphanList)
