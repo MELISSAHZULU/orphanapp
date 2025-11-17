@@ -6,7 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -14,23 +14,19 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
-data class StaffMember(val id: Int, val name: String, val role: String)
+import com.example.orphanapp.data.AppRepository
+import com.example.orphanapp.data.StaffMember
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StaffManagementScreen(navController: NavController) {
-    val staffList = listOf(
-        StaffMember(1, "Alice Johnson", "Administrator"),
-        StaffMember(2, "Bob Williams", "Caregiver"),
-        StaffMember(3, "Charlie Brown", "Cook")
-    )
+    val staffList = AppRepository.staff
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Staff Management") },
-                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.Default.ArrowBack, contentDescription = "Back") } },
+                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -72,10 +68,14 @@ fun StaffListItem(staff: StaffMember, onClick: () -> Unit) {
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(text = staff.name, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                 Text(text = staff.role, style = MaterialTheme.typography.bodyMedium, color = MaterialTheme.colorScheme.onSurfaceVariant)
             }
+            Text(
+                text = if (staff.isActive) "Active" else "Inactive",
+                color = if (staff.isActive) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error
+            )
         }
     }
 }

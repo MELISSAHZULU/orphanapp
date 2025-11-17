@@ -98,6 +98,9 @@ fun OrphanageApp(
                 composable("photo_gallery") {
                     PhotoGalleryScreen(navController)
                 }
+                composable("add_photo") {
+                    AddPhotoScreen(navController)
+                }
                 composable("activity_log") {
                     ActivityLogScreen(navController)
                 }
@@ -129,6 +132,9 @@ fun OrphanageApp(
                 composable("conversation/{contactName}") { backStackEntry ->
                     val contactName = backStackEntry.arguments?.getString("contactName")
                     ConversationScreen(navController, contactName)
+                }
+                composable("announcements") {
+                    AnnouncementsScreen(navController)
                 }
                 composable("privacy_policy") {
                     PrivacyPolicyScreen(navController)

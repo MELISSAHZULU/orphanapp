@@ -11,20 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
-import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -40,15 +27,14 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
     var name by remember(orphan) { mutableStateOf(orphan?.name ?: "") }
     var age by remember(orphan) { mutableStateOf(orphan?.age?.toString() ?: "") }
     var gender by remember(orphan) { mutableStateOf(orphan?.gender ?: "") }
-    var status by remember(orphan) { mutableStateOf(orphan?.status ?: "") }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (orphan != null) "Orphan Profile: ${orphan.name}" else "Loading...") },
+                title = { Text(if (orphan != null) "Profile: ${orphan.name}" else "Loading...") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
                 actions = {
-                    if (orphan != null) {
+                    if (orphan != null && orphan.status == "Active") {
                         IconButton(onClick = { isEditing = !isEditing }) {
                             Icon(Icons.Default.Edit, contentDescription = "Edit")
                         }
@@ -60,9 +46,6 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        },
-        bottomBar = {
-            BottomNavigationBar(navController, "profile")
         }
     ) { padding ->
         if (orphan == null) {
@@ -82,48 +65,35 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                     .padding(padding)
                     .padding(16.dp)
             ) {
-                // Basic Info Card
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        if (isEditing) {
-                            OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") })
-                            OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") })
-                            OutlinedTextField(value = gender, onValueChange = { gender = it }, label = { Text("Gender") })
-                            OutlinedTextField(value = status, onValueChange = { status = it }, label = { Text("Status") })
-                        } else {
-                            Text("Name: ${orphan.name}", style = MaterialTheme.typography.bodyLarge)
-                            Text("Age: ${orphan.age}", style = MaterialTheme.typography.bodyLarge)
-                            Text("Gender: ${orphan.gender}", style = MaterialTheme.typography.bodyLarge)
-                            Text("Enrollment Date: 2025-10-10", style = MaterialTheme.typography.bodyLarge) // Placeholder
-                            Text("Status: ${orphan.status}", style = MaterialTheme.typography.bodyLarge)
-                        }
-                    }
-                }
+                if (isEditing) {
+                    // Editing Mode UI
+                    OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth())
+                    Spacer(modifier = Modifier.height(8.dp))
+                    OutlinedTextField(value = gender, onValueChange = { gender = it }, label = { Text("Gender") }, modifier = Modifier.fillMaxWidth())
 
-                // Records Section
-                Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Records", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        RecordItem(label = "Health Records", action = "View/Edit")
-                        RecordItem(label = "Education Progress", action = "View/Edit")
-                        RecordItem(label = "Donations Received", action = "View")
-                        RecordItem(label = "Sponsor Info", action = "View/Edit")
-                        RecordItem(label = "Adoption Requests", action = "View")
-                        RecordItem(label = "Activity Logs", action = "View/Add")
-                    }
+                } else {
+                    // Read-Only UI
+                    Text("Name: ${orphan.name}", style = MaterialTheme.typography.bodyLarge)
+                    Text("Age: ${orphan.age}", style = MaterialTheme.typography.bodyLarge)
+                    Text("Gender: ${orphan.gender}", style = MaterialTheme.typography.bodyLarge)
+                    Text("Status: ${orphan.status}", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
                 }
+                
                 Spacer(modifier = Modifier.weight(1f))
 
                 // Action Buttons
-                Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = if (orphan.status == "Pending" && !isEditing) Arrangement.SpaceBetween else Arrangement.End
+                ) {
                     if (isEditing) {
                         Button(onClick = {
                             val updatedOrphan = orphan.copy(
                                 name = name,
                                 age = age.toIntOrNull() ?: orphan.age,
-                                gender = gender,
-                                status = status
+                                gender = gender
                             )
                             onUpdate(updatedOrphan)
                             isEditing = false
@@ -135,25 +105,21 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                             Button(onClick = {
                                 val updatedOrphan = orphan.copy(status = "Active")
                                 onUpdate(updatedOrphan)
+                                navController.popBackStack()
                             }) {
                                 Text("Verify")
                             }
+                            OutlinedButton(onClick = { 
+                                val updatedOrphan = orphan.copy(status = "Declined")
+                                onUpdate(updatedOrphan)
+                                navController.popBackStack()
+                            }) {
+                                Text("Decline", color = MaterialTheme.colorScheme.error)
+                            }
                         }
-                    }
-                    OutlinedButton(onClick = { navController.navigate("tracking") }) {
-                        Text("Back to List", color = MaterialTheme.colorScheme.primary)
                     }
                 }
             }
         }
-    }
-}
-
-@Composable
-fun RecordItem(label: String, action: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
-        Text(label, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Bold)
-        Spacer(modifier = Modifier.weight(1f))
-        Text("[$action]", color = MaterialTheme.colorScheme.secondary)
     }
 }

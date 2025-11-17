@@ -94,8 +94,11 @@ fun DashboardScreen(
                         }
                     },
                     actions = {
+                        IconButton(onClick = { navController.navigate("announcements") }) {
+                            Icon(Icons.Filled.Campaign, contentDescription = "Announcements")
+                        }
                         IconButton(onClick = { navController.navigate("user_profile") }) {
-                            Icon(Icons.Filled.AccountCircle, contentDescription = "User Profile", modifier = Modifier.size(40.dp))
+                            Icon(Icons.Filled.AccountCircle, contentDescription = "User Profile")
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(

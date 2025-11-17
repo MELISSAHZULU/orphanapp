@@ -19,14 +19,18 @@ import androidx.navigation.NavController
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddEditInventoryItemScreen(navController: NavController, itemId: Int?) {
+    val isEditing = itemId != null
     var itemName by remember { mutableStateOf("") }
     var itemQuantity by remember { mutableStateOf("") }
-    // In a real app, you would fetch the item if itemId is not null
+
+    // In a real app, if isEditing, you would load the item's name and current quantity here.
+    val screenTitle = if (isEditing) "Edit Item Quantity" else "Add New Item"
+    val currentItemName = if (isEditing) "Editing Item #$itemId" else ""
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (itemId == null) "Add Item" else "Edit Item") },
+                title = { Text(screenTitle) },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } }
             )
         }
@@ -37,14 +41,22 @@ fun AddEditInventoryItemScreen(navController: NavController, itemId: Int?) {
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            OutlinedTextField(
-                value = itemName,
-                onValueChange = { itemName = it },
-                modifier = Modifier.fillMaxWidth(),
-                label = { Text("Item Name") },
-                singleLine = true
-            )
-            Spacer(modifier = Modifier.height(16.dp))
+            if (isEditing) {
+                // In edit mode, show the item name but don't allow editing it.
+                Text("Item: $currentItemName", style = MaterialTheme.typography.headlineSmall)
+                Spacer(modifier = Modifier.height(16.dp))
+            } else {
+                // In add mode, allow entering the item name.
+                OutlinedTextField(
+                    value = itemName,
+                    onValueChange = { itemName = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    label = { Text("Item Name") },
+                    singleLine = true
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+            }
+
             OutlinedTextField(
                 value = itemQuantity,
                 onValueChange = { itemQuantity = it },

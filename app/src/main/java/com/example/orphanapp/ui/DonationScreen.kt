@@ -10,6 +10,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import com.example.orphanapp.data.AppRepository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -59,7 +63,12 @@ fun DonationScreen(navController: NavController) {
             )
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = { /* TODO: Process Donation */ navController.navigate("donation_history") },
+                onClick = { 
+                    val sdf = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    val currentDate = sdf.format(Date())
+                    AppRepository.addDonation(donorName, amount, currentDate)
+                    navController.navigate("donation_history") 
+                },
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text("Donate Now")

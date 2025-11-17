@@ -20,10 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.orphanapp.R
+import com.google.firebase.auth.FirebaseAuth
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun UserProfileScreen(navController: NavController) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -63,32 +66,28 @@ fun UserProfileScreen(navController: NavController) {
             }
             Spacer(modifier = Modifier.height(24.dp))
 
-            UserInfoSection(navController = navController)
-        }
-    }
-}
+            Column(modifier = Modifier.fillMaxWidth()) {
+                InfoRow(label = "Display Name", value = currentUser?.displayName ?: "N/A")
+                InfoRow(label = "Email Address", value = currentUser?.email ?: "N/A")
+                // In a real app, role would come from a custom claim or Firestore
+                InfoRow(label = "User Role", value = "Health Worker") 
+                
+                Spacer(modifier = Modifier.height(24.dp))
 
-@Composable
-fun UserInfoSection(navController: NavController) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        InfoRow(label = "Display Name", value = "John Doe")
-        InfoRow(label = "Email Address", value = "j.doe@example.com")
-        InfoRow(label = "User Role", value = "Health Worker")
-        
-        Spacer(modifier = Modifier.height(24.dp))
-
-        Button(
-            onClick = { navController.navigate("edit_profile") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Edit Profile")
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        OutlinedButton(
-            onClick = { navController.navigate("change_password") },
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text("Change Password")
+                Button(
+                    onClick = { navController.navigate("edit_profile") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Edit Profile")
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedButton(
+                    onClick = { navController.navigate("change_password") },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text("Change Password")
+                }
+            }
         }
     }
 }
@@ -96,7 +95,7 @@ fun UserInfoSection(navController: NavController) {
 @Composable
 fun InfoRow(label: String, value: String) {
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
-        Text(text = label, style = MaterialTheme.typography.bodySmall, color = Color.Gray)
+        Text(text = label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
         Text(text = value, style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.SemiBold)
         Divider(modifier = Modifier.padding(top = 8.dp))
     }
