@@ -104,6 +104,9 @@ fun OrphanageApp(
                 composable("donation") {
                     DonationScreen(navController)
                 }
+                composable("donation_history") {
+                    DonationHistoryScreen(navController)
+                }
                 composable("impact_reporting") {
                     ImpactReportingScreen(navController)
                 }
@@ -112,6 +115,13 @@ fun OrphanageApp(
                 }
                 composable("staff_management") {
                     StaffManagementScreen(navController)
+                }
+                composable("add_edit_staff/{staffId}") { backStackEntry ->
+                    val staffId = backStackEntry.arguments?.getString("staffId")?.toIntOrNull()
+                    AddEditStaffScreen(navController, staffId)
+                }
+                composable("add_edit_staff") {
+                    AddEditStaffScreen(navController, null)
                 }
                 composable("communication") {
                     CommunicationScreen(navController)
