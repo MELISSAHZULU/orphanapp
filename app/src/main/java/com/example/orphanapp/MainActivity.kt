@@ -116,6 +116,10 @@ fun OrphanageApp(
                 composable("communication") {
                     CommunicationScreen(navController)
                 }
+                composable("conversation/{contactName}") { backStackEntry ->
+                    val contactName = backStackEntry.arguments?.getString("contactName")
+                    ConversationScreen(navController, contactName)
+                }
                 composable("privacy_policy") {
                     PrivacyPolicyScreen(navController)
                 }
