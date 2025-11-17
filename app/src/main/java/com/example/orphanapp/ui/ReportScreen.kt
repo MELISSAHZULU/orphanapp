@@ -33,7 +33,8 @@ fun ReportScreen(navController: NavController, orphanList: List<Orphan>) {
     val totalOrphans = orphanList.size
     val verifiedOrphans = orphanList.count { it.status == "Active" }
     val pendingVerification = totalOrphans - verifiedOrphans
-    val availableBeds = 20 // Placeholder
+    val totalBeds = 100
+    val availableBeds = totalBeds - verifiedOrphans
     val inventoryItems = listOf("Rice", "T-shirts", "Notebooks", "Soap") // Placeholder
     val activityLog = listOf("John Doe visited the orphanage.", "New donation of clothes received.") // Placeholder
 
@@ -73,6 +74,8 @@ fun ReportScreen(navController: NavController, orphanList: List<Orphan>) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Bed Occupancy", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
+                        Text("Total Beds: $totalBeds")
+                        Text("Occupied Beds: $verifiedOrphans")
                         Text("Available Beds: $availableBeds")
                     }
                 }
