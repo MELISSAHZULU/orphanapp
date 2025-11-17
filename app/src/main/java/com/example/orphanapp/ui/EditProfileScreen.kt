@@ -54,10 +54,11 @@ fun EditProfileScreen(navController: NavController) {
                     currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
                         if (task.isSuccessful) {
                             Log.d("EditProfile", "User profile updated.")
+                            // Navigate back to the profile screen to show the update
                             navController.popBackStack()
                         } else {
                             Log.w("EditProfile", "Error updating profile.", task.exception)
-                            // Optionally, show an error message to the user
+                            // Optionally, you could show an error message to the user here
                         }
                     }
                 },

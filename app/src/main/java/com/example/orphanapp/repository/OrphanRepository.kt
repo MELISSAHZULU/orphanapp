@@ -25,14 +25,20 @@ class OrphanRepositoryImpl : OrphanRepository {
                 close(error)
                 return@addSnapshotListener
             }
-            try {
-                if (snapshot != null) {
-                    val orphans = snapshot.toObjects(Orphan::class.java)
-                    trySend(orphans).isSuccess
+            if (snapshot != null) {
+                // Manually map documents to include the document ID
+                val orphans = snapshot.documents.mapNotNull { document ->
+                    try {
+                        val orphan = document.toObject(Orphan::class.java)
+                        orphan?.copy(documentId = document.id)
+                    } catch (e: Exception) {
+                        Log.e("OrphanRepository", "Error converting document", e)
+                        null
+                    }
                 }
-            } catch (e: Exception) {
-                Log.e("OrphanRepository", "Error converting snapshot to objects", e)
-                close(e) // Close the flow on error
+                trySend(orphans)
+            } else {
+                 trySend(emptyList())
             }
         }
         awaitClose { listenerRegistration.remove() }
@@ -45,6 +51,8 @@ class OrphanRepositoryImpl : OrphanRepository {
     override suspend fun updateOrphan(orphan: Orphan) {
         if (orphan.documentId.isNotEmpty()) {
             orphansCollection.document(orphan.documentId).set(orphan).await()
+        } else {
+            Log.w("OrphanRepository", "Cannot update orphan without a document ID.")
         }
     }
 }

@@ -1,6 +1,9 @@
 package com.example.orphanapp.ui
 
-import androidx.compose.foundation.Image
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,16 +21,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-
+import io.coil.compose.AsyncImage
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PhotoGalleryScreen(navController: NavController) {
-    // In a real app, this would come from a ViewModel or repository.
-    val imageList = remember { mutableStateListOf<Int>() }
+    // This list will hold the URIs of the images selected from the gallery.
+    // Note: This list is temporary and will reset when the app closes.
+    val imageUris = remember { mutableStateListOf<Uri>() }
+
+    // This is the modern way to launch the photo picker in Android.
+    val photoPickerLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickVisualMedia(),
+        onResult = { uri: Uri? ->
+            // The onResult callback receives the URI of the selected image.
+            uri?.let { imageUris.add(it) }
+        }
+    )
 
     Scaffold(
         topBar = {
@@ -42,19 +54,22 @@ fun PhotoGalleryScreen(navController: NavController) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("add_photo") }) {
+            FloatingActionButton(onClick = {
+                // Launch the photo picker.
+                photoPickerLauncher.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            }) {
                 Icon(Icons.Default.Add, contentDescription = "Add Photo")
             }
         }
     ) { padding ->
-        if (imageList.isEmpty()) {
+        if (imageUris.isEmpty()) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(padding),
                 contentAlignment = Alignment.Center
             ) {
-                Text("No photos in the gallery yet.")
+                Text("No photos in the gallery yet. Tap '+' to add.")
             }
         } else {
             LazyVerticalGrid(
@@ -64,15 +79,16 @@ fun PhotoGalleryScreen(navController: NavController) {
                     .padding(padding)
                     .padding(4.dp)
             ) {
-                items(imageList) { imageRes ->
+                items(imageUris) { uri ->
                     Card(
                         modifier = Modifier
                             .padding(4.dp)
                             .aspectRatio(1f)
                     ) {
-                        Image(
-                            painter = painterResource(id = imageRes),
-                            contentDescription = null, // Decorative
+                        // Use Coil to load the image from the URI asynchronously.
+                        AsyncImage(
+                            model = uri,
+                            contentDescription = "User-selected image",
                             modifier = Modifier.fillMaxSize(),
                             contentScale = ContentScale.Crop
                         )
