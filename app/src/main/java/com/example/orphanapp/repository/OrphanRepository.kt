@@ -26,10 +26,11 @@ class OrphanRepositoryImpl : OrphanRepository {
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                // Manually map documents to include the document ID
+                // Map documents to include the document ID, which is crucial for updates
                 val orphans = snapshot.documents.mapNotNull { document ->
                     try {
                         val orphan = document.toObject(Orphan::class.java)
+                        // Important: Assign the document ID to the orphan object
                         orphan?.copy(documentId = document.id)
                     } catch (e: Exception) {
                         Log.e("OrphanRepository", "Error converting document", e)
@@ -52,7 +53,7 @@ class OrphanRepositoryImpl : OrphanRepository {
         if (orphan.documentId.isNotEmpty()) {
             orphansCollection.document(orphan.documentId).set(orphan).await()
         } else {
-            Log.w("OrphanRepository", "Cannot update orphan without a document ID.")
+            Log.w("OrphanRepository", "Cannot update orphan without a document ID. Make sure it is fetched correctly.")
         }
     }
 }

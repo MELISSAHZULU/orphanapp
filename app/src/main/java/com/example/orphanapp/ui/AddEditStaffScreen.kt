@@ -9,17 +9,28 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.orphanapp.data.AppRepository
+import com.example.orphanapp.data.StaffMember
+import com.example.orphanapp.viewmodel.StaffViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditStaffScreen(navController: NavController, staffId: Int?) {
+fun AddEditStaffScreen(navController: NavController, staffViewModel: StaffViewModel, staffId: String?) {
+    val staffList by staffViewModel.staff.collectAsState()
     val isEditing = staffId != null
-    val staffMember = if (isEditing) AppRepository.getStaffMember(staffId!!) else null
+    val staffMember = if (isEditing) staffList.find { it.id == staffId } else null
 
     var staffName by remember { mutableStateOf(staffMember?.name ?: "") }
     var staffRole by remember { mutableStateOf(staffMember?.role ?: "") }
     var isActive by remember { mutableStateOf(staffMember?.isActive ?: true) }
+
+    // This will update the local state if the staffMember data changes (e.g., after a remote update)
+    LaunchedEffect(staffMember) {
+        if (staffMember != null) {
+            staffName = staffMember.name
+            staffRole = staffMember.role
+            isActive = staffMember.isActive
+        }
+    }
 
     Scaffold(
         topBar = {
@@ -70,15 +81,27 @@ fun AddEditStaffScreen(navController: NavController, staffId: Int?) {
             }
             Spacer(modifier = Modifier.height(24.dp))
             Button(
-                onClick = { 
+                onClick = {
+                    val updatedStaffMember = staffMember?.copy(
+                        name = staffName,
+                        role = staffRole,
+                        isActive = isActive
+                    ) ?: StaffMember(
+                        id = "", // Firestore will generate this
+                        name = staffName,
+                        role = staffRole,
+                        isActive = isActive
+                    )
+
                     if (isEditing) {
-                        AppRepository.updateStaffMember(staffId!!, staffName, staffRole, isActive)
+                        staffViewModel.updateStaff(updatedStaffMember)
                     } else {
-                        AppRepository.addStaff(staffName, staffRole)
+                        staffViewModel.addStaff(updatedStaffMember)
                     }
-                    navController.popBackStack() 
+                    navController.popBackStack()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = staffName.isNotBlank() && staffRole.isNotBlank()
             ) {
                 Text("Save")
             }

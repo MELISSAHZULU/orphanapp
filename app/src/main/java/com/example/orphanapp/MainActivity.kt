@@ -16,18 +16,24 @@ import com.example.orphanapp.ui.theme.OrphanAppTheme
 import com.example.orphanapp.viewmodel.AuthState
 import com.example.orphanapp.viewmodel.AuthViewModel
 import com.example.orphanapp.viewmodel.AuthViewModelFactory
+import com.example.orphanapp.viewmodel.DonationViewModel
+import com.example.orphanapp.viewmodel.DonationViewModelFactory
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
 import com.example.orphanapp.viewmodel.EnrollmentViewModelFactory
+import com.example.orphanapp.viewmodel.StaffViewModel
+import com.example.orphanapp.viewmodel.StaffViewModelFactory
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels { AuthViewModelFactory((application as OrphanApplication).authRepository) }
     private val enrollmentViewModel: EnrollmentViewModel by viewModels { EnrollmentViewModelFactory((application as OrphanApplication).orphanRepository) }
+    private val donationViewModel: DonationViewModel by viewModels { DonationViewModelFactory((application as OrphanApplication).donationRepository) }
+    private val staffViewModel: StaffViewModel by viewModels { StaffViewModelFactory((application as OrphanApplication).staffRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OrphanAppTheme {
-                OrphanageApp(authViewModel, enrollmentViewModel)
+                OrphanageApp(authViewModel, enrollmentViewModel, donationViewModel, staffViewModel)
             }
         }
     }
@@ -36,7 +42,9 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun OrphanageApp(
     authViewModel: AuthViewModel,
-    enrollmentViewModel: EnrollmentViewModel
+    enrollmentViewModel: EnrollmentViewModel,
+    donationViewModel: DonationViewModel,
+    staffViewModel: StaffViewModel
 ) {
     val navController = rememberNavController()
     val orphanList by enrollmentViewModel.orphans.collectAsState()
@@ -62,8 +70,8 @@ fun OrphanageApp(
                     TrackingScreen(orphanList, navController)
                 }
                 composable("profile/{id}") { backStackEntry ->
-                    val id = backStackEntry.arguments?.getString("id")?.toIntOrNull()
-                    val orphan = orphanList.find { it.id == id }
+                    val id = backStackEntry.arguments?.getString("id")
+                    val orphan = orphanList.find { it.documentId == id }
                     OrphanProfileScreen(navController, orphan) { updatedOrphan ->
                         enrollmentViewModel.updateOrphan(updatedOrphan)
                     }
@@ -105,10 +113,10 @@ fun OrphanageApp(
                     ActivityLogScreen(navController)
                 }
                 composable("donation") {
-                    DonationScreen(navController)
+                    DonationScreen(navController, donationViewModel)
                 }
                 composable("donation_history") {
-                    DonationHistoryScreen(navController)
+                    DonationHistoryScreen(navController, donationViewModel)
                 }
                 composable("impact_reporting") {
                     ImpactReportingScreen(navController)
@@ -117,14 +125,14 @@ fun OrphanageApp(
                     InventoryScreen(navController)
                 }
                 composable("staff_management") {
-                    StaffManagementScreen(navController)
+                    StaffManagementScreen(navController, staffViewModel)
                 }
                 composable("add_edit_staff/{staffId}") { backStackEntry ->
-                    val staffId = backStackEntry.arguments?.getString("staffId")?.toIntOrNull()
-                    AddEditStaffScreen(navController, staffId)
+                    val staffId = backStackEntry.arguments?.getString("staffId")
+                    AddEditStaffScreen(navController, staffViewModel, staffId)
                 }
                 composable("add_edit_staff") {
-                    AddEditStaffScreen(navController, null)
+                    AddEditStaffScreen(navController, staffViewModel, null)
                 }
                 composable("communication") {
                     CommunicationScreen(navController)
@@ -140,7 +148,7 @@ fun OrphanageApp(
                     PrivacyPolicyScreen(navController)
                 }
                 composable("user_profile") {
-                    UserProfileScreen(navController)
+                    UserProfileScreen(navController, authViewModel)
                 }
                 composable("edit_profile") {
                     EditProfileScreen(navController)
@@ -149,7 +157,7 @@ fun OrphanageApp(
                     ChangePasswordScreen(navController)
                 }
                 composable("add_edit_inventory_item/{itemId}") { backStackEntry ->
-                    val itemId = backStackEntry.arguments?.getString("itemId")?.toIntOrNull()
+                    val itemId = backStackEntry.arguments?.getString("itemId")
                     AddEditInventoryItemScreen(navController, itemId)
                 }
                 composable("add_edit_inventory_item") {

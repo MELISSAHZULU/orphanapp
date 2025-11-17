@@ -18,7 +18,7 @@ import androidx.navigation.NavController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AddEditInventoryItemScreen(navController: NavController, itemId: Int?) {
+fun AddEditInventoryItemScreen(navController: NavController, itemId: String?) {
     val isEditing = itemId != null
     var itemName by remember { mutableStateOf("") }
     var itemQuantity by remember { mutableStateOf("") }

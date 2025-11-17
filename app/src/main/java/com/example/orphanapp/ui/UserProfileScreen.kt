@@ -11,6 +11,8 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -20,12 +22,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.orphanapp.R
-import com.google.firebase.auth.FirebaseAuth
+import com.example.orphanapp.viewmodel.AuthState
+import com.example.orphanapp.viewmodel.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun UserProfileScreen(navController: NavController) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
+fun UserProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
+    val authState by authViewModel.authState.collectAsState()
+    val user = (authState as? AuthState.Authenticated)?.user
 
     Scaffold(
         topBar = {
@@ -67,8 +71,8 @@ fun UserProfileScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
 
             Column(modifier = Modifier.fillMaxWidth()) {
-                InfoRow(label = "Display Name", value = currentUser?.displayName ?: "N/A")
-                InfoRow(label = "Email Address", value = currentUser?.email ?: "N/A")
+                InfoRow(label = "Display Name", value = user?.displayName ?: "N/A")
+                InfoRow(label = "Email Address", value = user?.email ?: "N/A")
                 // In a real app, role would come from a custom claim or Firestore
                 InfoRow(label = "User Role", value = "Health Worker") 
                 
