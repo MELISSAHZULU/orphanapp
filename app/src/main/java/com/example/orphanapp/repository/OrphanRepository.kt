@@ -1,7 +1,7 @@
 package com.example.orphanapp.repository
 
 import android.util.Log
-import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.data.Orphan // This now correctly refers to the class in Models.kt
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -26,18 +26,15 @@ class OrphanRepositoryImpl : OrphanRepository {
                 return@addSnapshotListener
             }
             if (snapshot != null) {
-                // Map documents to include the document ID, which is crucial for updates
-                val orphans = snapshot.documents.mapNotNull { document ->
-                    try {
-                        val orphan = document.toObject(Orphan::class.java)
-                        // Important: Assign the document ID to the orphan object
-                        orphan?.copy(documentId = document.id)
-                    } catch (e: Exception) {
-                        Log.e("OrphanRepository", "Error converting document", e)
-                        null
-                    }
+                try {
+                    // toObjects() automatically maps the documents to our data class.
+                    // The @DocumentId annotation in the Orphan class handles the ID.
+                    val orphans = snapshot.toObjects(Orphan::class.java)
+                    trySend(orphans)
+                } catch (e: Exception) {
+                    Log.e("OrphanRepository", "Error converting snapshot to objects", e)
+                    close(e)
                 }
-                trySend(orphans)
             } else {
                  trySend(emptyList())
             }
@@ -46,14 +43,16 @@ class OrphanRepositoryImpl : OrphanRepository {
     }
 
     override suspend fun addOrphan(orphan: Orphan) {
+        // Firestore will automatically generate an ID for the new document.
         orphansCollection.add(orphan).await()
     }
 
     override suspend fun updateOrphan(orphan: Orphan) {
+        // We must have a documentId to update an existing orphan record.
         if (orphan.documentId.isNotEmpty()) {
             orphansCollection.document(orphan.documentId).set(orphan).await()
         } else {
-            Log.w("OrphanRepository", "Cannot update orphan without a document ID. Make sure it is fetched correctly.")
+            Log.w("OrphanRepository", "Cannot update orphan without a document ID.")
         }
     }
 }

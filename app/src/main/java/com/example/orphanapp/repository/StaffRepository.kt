@@ -1,7 +1,7 @@
 package com.example.orphanapp.repository
 
 import android.util.Log
-import com.example.orphanapp.data.StaffMember
+import com.example.orphanapp.data.StaffMember // This now correctly refers to the class in Models.kt
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow

@@ -27,12 +27,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.data.Orphan // Corrected Import
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackingScreen(orphanList: List<Orphan>, navController: NavController) {
     var searchQuery by remember { mutableStateOf("") }
+
+    val filteredList = if (searchQuery.isBlank()) {
+        orphanList
+    } else {
+        orphanList.filter { it.name.contains(searchQuery, ignoreCase = true) }
+    }
 
     Scaffold(
         topBar = {
@@ -54,32 +60,29 @@ fun TrackingScreen(orphanList: List<Orphan>, navController: NavController) {
                 .padding(padding)
                 .padding(16.dp)
         ) {
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    label = { Text("Search Orphan") },
-                    modifier = Modifier.weight(1f),
-                    shape = RoundedCornerShape(24.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Button(onClick = { /* Handle Search */ }) {
-                    Text("Search")
-                }
-            }
+            OutlinedTextField(
+                value = searchQuery,
+                onValueChange = { searchQuery = it },
+                label = { Text("Search by Name") },
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(24.dp)
+            )
             Spacer(modifier = Modifier.padding(16.dp))
-            LazyColumn {
-                items(orphanList) { orphan ->
+            LazyColumn(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                items(filteredList) { orphan ->
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(8.dp)
-                            .clickable { navController.navigate("profile/${orphan.id}") },
+                            .clickable { navController.navigate("profile/${orphan.documentId}") }, // Corrected Navigation
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
-                        Row(modifier = Modifier.padding(16.dp), horizontalArrangement = Arrangement.SpaceBetween) {
-                            Text(orphan.name)
-                            Text(orphan.status)
+                        Row(
+                            modifier = Modifier.fillMaxWidth().padding(16.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Text(orphan.name, style = MaterialTheme.typography.bodyLarge)
+                            Text(orphan.status, style = MaterialTheme.typography.bodyMedium)
                         }
                     }
                 }

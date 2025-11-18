@@ -1,14 +1,7 @@
 package com.example.orphanapp
 
 import android.app.Application
-import com.example.orphanapp.repository.AuthRepository
-import com.example.orphanapp.repository.AuthRepositoryImpl
-import com.example.orphanapp.repository.DonationRepository
-import com.example.orphanapp.repository.DonationRepositoryImpl
-import com.example.orphanapp.repository.OrphanRepository
-import com.example.orphanapp.repository.OrphanRepositoryImpl
-import com.example.orphanapp.repository.StaffRepository
-import com.example.orphanapp.repository.StaffRepositoryImpl
+import com.example.orphanapp.repository.*
 import com.google.firebase.FirebaseApp
 
 class OrphanApplication : Application() {
@@ -17,6 +10,7 @@ class OrphanApplication : Application() {
     lateinit var authRepository: AuthRepository
     lateinit var donationRepository: DonationRepository
     lateinit var staffRepository: StaffRepository
+    lateinit var inventoryRepository: InventoryRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -25,5 +19,6 @@ class OrphanApplication : Application() {
         authRepository = AuthRepositoryImpl()
         donationRepository = DonationRepositoryImpl()
         staffRepository = StaffRepositoryImpl()
+        inventoryRepository = InventoryRepositoryImpl()
     }
 }

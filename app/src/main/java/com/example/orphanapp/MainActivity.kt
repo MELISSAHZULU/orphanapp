@@ -11,29 +11,23 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.*
+import com.example.orphanapp.data.Orphan
 import com.example.orphanapp.ui.*
 import com.example.orphanapp.ui.theme.OrphanAppTheme
-import com.example.orphanapp.viewmodel.AuthState
-import com.example.orphanapp.viewmodel.AuthViewModel
-import com.example.orphanapp.viewmodel.AuthViewModelFactory
-import com.example.orphanapp.viewmodel.DonationViewModel
-import com.example.orphanapp.viewmodel.DonationViewModelFactory
-import com.example.orphanapp.viewmodel.EnrollmentViewModel
-import com.example.orphanapp.viewmodel.EnrollmentViewModelFactory
-import com.example.orphanapp.viewmodel.StaffViewModel
-import com.example.orphanapp.viewmodel.StaffViewModelFactory
+import com.example.orphanapp.viewmodel.*
 
 class MainActivity : ComponentActivity() {
     private val authViewModel: AuthViewModel by viewModels { AuthViewModelFactory((application as OrphanApplication).authRepository) }
     private val enrollmentViewModel: EnrollmentViewModel by viewModels { EnrollmentViewModelFactory((application as OrphanApplication).orphanRepository) }
     private val donationViewModel: DonationViewModel by viewModels { DonationViewModelFactory((application as OrphanApplication).donationRepository) }
     private val staffViewModel: StaffViewModel by viewModels { StaffViewModelFactory((application as OrphanApplication).staffRepository) }
+    private val inventoryViewModel: InventoryViewModel by viewModels { InventoryViewModelFactory((application as OrphanApplication).inventoryRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OrphanAppTheme {
-                OrphanageApp(authViewModel, enrollmentViewModel, donationViewModel, staffViewModel)
+                OrphanageApp(authViewModel, enrollmentViewModel, donationViewModel, staffViewModel, inventoryViewModel)
             }
         }
     }
@@ -44,7 +38,8 @@ fun OrphanageApp(
     authViewModel: AuthViewModel,
     enrollmentViewModel: EnrollmentViewModel,
     donationViewModel: DonationViewModel,
-    staffViewModel: StaffViewModel
+    staffViewModel: StaffViewModel,
+    inventoryViewModel: InventoryViewModel
 ) {
     val navController = rememberNavController()
     val orphanList by enrollmentViewModel.orphans.collectAsState()
@@ -122,7 +117,7 @@ fun OrphanageApp(
                     ImpactReportingScreen(navController)
                 }
                 composable("inventory") {
-                    InventoryScreen(navController)
+                    InventoryScreen(navController, inventoryViewModel)
                 }
                 composable("staff_management") {
                     StaffManagementScreen(navController, staffViewModel)
@@ -158,10 +153,10 @@ fun OrphanageApp(
                 }
                 composable("add_edit_inventory_item/{itemId}") { backStackEntry ->
                     val itemId = backStackEntry.arguments?.getString("itemId")
-                    AddEditInventoryItemScreen(navController, itemId)
+                    AddEditInventoryItemScreen(navController, inventoryViewModel, itemId)
                 }
                 composable("add_edit_inventory_item") {
-                    AddEditInventoryItemScreen(navController, null)
+                    AddEditInventoryItemScreen(navController, inventoryViewModel, null)
                 }
 
             }

@@ -1,7 +1,7 @@
 package com.example.orphanapp.repository
 
 import android.util.Log
-import com.example.orphanapp.data.Donation
+import com.example.orphanapp.data.Donation // This now correctly refers to the class in Models.kt
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
 import kotlinx.coroutines.channels.awaitClose
@@ -30,7 +30,9 @@ class DonationRepositoryImpl : DonationRepository {
                 if (snapshot != null) {
                     val donations = snapshot.documents.mapNotNull { document ->
                         try {
+                            // The toObject() method now uses the correct Donation class
                             val donation = document.toObject(Donation::class.java)
+                            // The copy() method works because the ID field is now a String
                             donation?.copy(id = document.id)
                         } catch (e: Exception) {
                             Log.e("DonationRepository", "Error converting document", e)

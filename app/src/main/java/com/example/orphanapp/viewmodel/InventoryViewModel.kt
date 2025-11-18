@@ -4,20 +4,20 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.orphanapp.data.Orphan // Corrected Import
-import com.example.orphanapp.repository.OrphanRepository
+import com.example.orphanapp.data.InventoryItem
+import com.example.orphanapp.repository.InventoryRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
-class EnrollmentViewModel(private val repository: OrphanRepository) : ViewModel() {
+class InventoryViewModel(private val repository: InventoryRepository) : ViewModel() {
 
-    val orphans: StateFlow<List<Orphan>> = repository.getOrphans()
+    val inventory: StateFlow<List<InventoryItem>> = repository.getInventory()
         .catch { exception ->
-            Log.e("EnrollmentViewModel", "Error getting orphans", exception)
-            emit(emptyList()) // Emit an empty list on error to prevent crash
+            Log.e("InventoryViewModel", "Error getting inventory", exception)
+            emit(emptyList()) // Emit an empty list on error
         }
         .stateIn(
             scope = viewModelScope,
@@ -25,32 +25,32 @@ class EnrollmentViewModel(private val repository: OrphanRepository) : ViewModel(
             initialValue = emptyList()
         )
 
-    fun addOrphan(orphan: Orphan) {
+    fun addInventoryItem(item: InventoryItem) {
         viewModelScope.launch {
             try {
-                repository.addOrphan(orphan)
+                repository.addInventoryItem(item)
             } catch (e: Exception) {
-                Log.e("EnrollmentViewModel", "Failed to add orphan", e)
+                Log.e("InventoryViewModel", "Failed to add inventory item", e)
             }
         }
     }
 
-    fun updateOrphan(orphan: Orphan) {
+    fun updateInventoryItem(item: InventoryItem) {
         viewModelScope.launch {
             try {
-                repository.updateOrphan(orphan)
+                repository.updateInventoryItem(item)
             } catch (e: Exception) {
-                Log.e("EnrollmentViewModel", "Failed to update orphan", e)
+                Log.e("InventoryViewModel", "Failed to update inventory item", e)
             }
         }
     }
 }
 
-class EnrollmentViewModelFactory(private val repository: OrphanRepository) : ViewModelProvider.Factory {
+class InventoryViewModelFactory(private val repository: InventoryRepository) : ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(EnrollmentViewModel::class.java)) {
+        if (modelClass.isAssignableFrom(InventoryViewModel::class.java)) {
             @Suppress("UNCHECKED_CAST")
-            return EnrollmentViewModel(repository) as T
+            return InventoryViewModel(repository) as T
         }
         throw IllegalArgumentException("Unknown ViewModel class")
     }
