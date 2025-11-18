@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -83,8 +82,8 @@ fun ViewProfileView(orphan: Orphan, navController: NavController) {
                     .size(150.dp)
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
-                error = painterResource(id = R.drawable.ic_launcher_background),
-                placeholder = painterResource(id = R.drawable.ic_launcher_background)
+                placeholder = painterResource(R.drawable.ic_launcher_background),
+                error = painterResource(R.drawable.ic_launcher_background)
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(orphan.name, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
@@ -173,14 +172,6 @@ fun EditProfileView(orphan: Orphan, onUpdate: (Orphan) -> Unit, onCancel: () -> 
                 Text("Update")
             }
         }
-    }
-}
-
-@Composable
-fun InfoRow(label: String, value: String) {
-    Row(modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp)) {
-        Text(text = "$label:", fontWeight = FontWeight.Bold, modifier = Modifier.width(120.dp))
-        Text(text = value)
     }
 }
 
