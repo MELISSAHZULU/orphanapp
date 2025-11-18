@@ -1,6 +1,1 @@
-package com.example.orphanapp.model
-
-data class User(
-    val uid: String,
-    val email: String?
-)
+// This file is deprecated and has been removed.

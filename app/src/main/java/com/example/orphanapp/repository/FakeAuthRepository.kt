@@ -1,39 +1,27 @@
 package com.example.orphanapp.repository
 
-import com.example.orphanapp.model.User
+import com.google.firebase.auth.FirebaseUser
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
+// This is a fake repository for testing purposes and does not interact with Firebase.
 class FakeAuthRepository : AuthRepository {
 
-    private val users = mutableListOf(
-        User(uid = "1", email = "test@example.com"),
-        User(uid = "2", email = "user@example.com")
-    )
+    // We don't have a good way to fake a FirebaseUser, so we'll just keep this simple.
+    private val _authState = MutableStateFlow<FirebaseUser?>(null)
+    override val authState: Flow<FirebaseUser?> = _authState
 
-    private val _currentUser = MutableStateFlow<User?>(null)
-    private fun setCurrentUser(user: User?) {
-        _currentUser.value = user
+    override suspend fun signIn(email: String, password: String): FirebaseUser? {
+        // Not implemented for fake repository
+        return null
     }
 
-    override suspend fun signIn(email: String, password: String): User? {
-        val user = users.find { it.email == email }
-        setCurrentUser(user)
-        return user
-    }
-
-    override suspend fun register(email: String, password: String): User? {
-        val newUser = User(uid = (users.size + 1).toString(), email = email)
-        users.add(newUser)
-        setCurrentUser(newUser)
-        return newUser
-    }
-
-    override fun getCurrentUser(): User? {
-        return _currentUser.value
+    override suspend fun register(email: String, password: String, displayName: String): FirebaseUser? {
+        // Not implemented for fake repository
+        return null
     }
 
     override fun signOut() {
-        setCurrentUser(null)
+        _authState.value = null
     }
 }

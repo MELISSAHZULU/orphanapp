@@ -13,12 +13,22 @@ data class Orphan(
     val name: String = "",
     val age: Int = 0,
     val gender: String = "",
-    var status: String = "Pending",
+    val enrollmentDate: String = "",
+    var status: String = "Pending", // e.g., Pending, Active, Inactive
     val photoUrl: String? = null,
-    // The fields below are kept for compatibility but can be expanded later
+
+    // Records
+    val healthRecords: String = "",
+    val orphanStory: String = "",
+    val donationsReceived: List<String> = emptyList(),
+    val sponsorInfo: String = "",
+    val educationProgress: String = "",
+
+    // Legacy/Compatibility fields
     val guardianName: String = "",
     val schoolName: String = ""
 )
+
 
 /**
  * Represents a single donation record. The `id` is the unique ID from Firestore.

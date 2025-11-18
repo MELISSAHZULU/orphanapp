@@ -9,7 +9,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-// Corrected User data class to include all necessary fields
+// Define the User data class locally within this file to avoid conflicts.
+// This is the single source of truth for the UI's User object.
 data class User(val uid: String, val email: String?, val displayName: String?)
 
 sealed class AuthState {
@@ -28,7 +29,7 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         viewModelScope.launch {
             repository.authState.collect { firebaseUser ->
                 if (firebaseUser != null) {
-                    // Map FirebaseUser to our custom User data class
+                    // Map the official FirebaseUser to our local UI-specific User data class
                     val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
                     _authState.value = AuthState.Authenticated(user)
                 } else {
@@ -41,13 +42,8 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             try {
-                val firebaseUser = repository.signIn(email, password)
-                if (firebaseUser != null) {
-                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
-                    _authState.value = AuthState.Authenticated(user)
-                } else {
-                    _authState.value = AuthState.Error("Invalid credentials")
-                }
+                // The repository now returns a FirebaseUser, which we handle in the init collector.
+                repository.signIn(email, password)
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Sign in failed", e)
                 _authState.value = AuthState.Error(e.message ?: "Sign in failed")
@@ -58,13 +54,8 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun register(email: String, password: String, displayName: String) {
         viewModelScope.launch {
             try {
-                val firebaseUser = repository.register(email, password, displayName)
-                if (firebaseUser != null) {
-                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
-                    _authState.value = AuthState.Authenticated(user)
-                } else {
-                    _authState.value = AuthState.Error("Registration failed")
-                }
+                // The repository now returns a FirebaseUser, which we handle in the init collector.
+                repository.register(email, password, displayName)
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Registration failed", e)
                 _authState.value = AuthState.Error(e.message ?: "Registration failed")
@@ -74,7 +65,6 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     fun signOut() {
         repository.signOut()
-        _authState.value = AuthState.Unauthenticated
     }
 }
 
