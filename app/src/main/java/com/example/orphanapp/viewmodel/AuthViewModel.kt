@@ -4,11 +4,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.orphanapp.model.User
 import com.example.orphanapp.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+
+// Corrected User data class to include all necessary fields
+data class User(val uid: String, val email: String?, val displayName: String?)
 
 sealed class AuthState {
     object Loading : AuthState()
@@ -24,11 +26,14 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     init {
         viewModelScope.launch {
-            val user = repository.getCurrentUser()
-            if (user != null) {
-                _authState.value = AuthState.Authenticated(user)
-            } else {
-                _authState.value = AuthState.Unauthenticated
+            repository.authState.collect { firebaseUser ->
+                if (firebaseUser != null) {
+                    // Map FirebaseUser to our custom User data class
+                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
+                    _authState.value = AuthState.Authenticated(user)
+                } else {
+                    _authState.value = AuthState.Unauthenticated
+                }
             }
         }
     }
@@ -36,8 +41,9 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             try {
-                val user = repository.signIn(email, password)
-                if (user != null) {
+                val firebaseUser = repository.signIn(email, password)
+                if (firebaseUser != null) {
+                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
                     _authState.value = AuthState.Authenticated(user)
                 } else {
                     _authState.value = AuthState.Error("Invalid credentials")
@@ -49,11 +55,12 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         }
     }
 
-    fun register(email: String, password: String) {
+    fun register(email: String, password: String, displayName: String) {
         viewModelScope.launch {
             try {
-                val user = repository.register(email, password)
-                if (user != null) {
+                val firebaseUser = repository.register(email, password, displayName)
+                if (firebaseUser != null) {
+                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
                     _authState.value = AuthState.Authenticated(user)
                 } else {
                     _authState.value = AuthState.Error("Registration failed")

@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -30,12 +29,9 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
+    var displayName by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var username by remember { mutableStateOf("") }
-    var userRole by remember { mutableStateOf("") }
-    var expanded by remember { mutableStateOf(false) }
-    val roles = listOf("Village Head", "Health Worker", "Orphanage Staff", "Admin")
 
     val authState by authViewModel.authState.collectAsState()
     val snackbarHostState = remember { SnackbarHostState() }
@@ -81,9 +77,9 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                 ) {
                     Column(modifier = Modifier.padding(24.dp)) {
                         OutlinedTextField(
-                            value = username,
-                            onValueChange = { username = it },
-                            label = { Text("Username") },
+                            value = displayName,
+                            onValueChange = { displayName = it },
+                            label = { Text("Name") },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(24.dp)
                         )
@@ -104,32 +100,10 @@ fun RegisterScreen(navController: NavController, authViewModel: AuthViewModel) {
                             visualTransformation = PasswordVisualTransformation(),
                             shape = RoundedCornerShape(24.dp)
                         )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
-                            OutlinedTextField(
-                                value = userRole,
-                                onValueChange = {},
-                                readOnly = true,
-                                label = { Text("User Role") },
-                                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .menuAnchor(),
-                                shape = RoundedCornerShape(24.dp)
-                            )
-                            ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-                                roles.forEach { role ->
-                                    DropdownMenuItem(text = { Text(role) }, onClick = {
-                                        userRole = role
-                                        expanded = false
-                                    })
-                                }
-                            }
-                        }
                         Spacer(modifier = Modifier.height(32.dp))
 
                         Button(
-                            onClick = { authViewModel.register(email, password) },
+                            onClick = { authViewModel.register(email, password, displayName) },
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(24.dp)
                         ) {

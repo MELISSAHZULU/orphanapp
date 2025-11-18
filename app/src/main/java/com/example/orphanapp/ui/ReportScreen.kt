@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.data.Orphan // Corrected Import
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

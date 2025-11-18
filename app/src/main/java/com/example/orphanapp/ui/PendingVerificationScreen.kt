@@ -27,7 +27,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.orphanapp.model.Orphan
+import com.example.orphanapp.data.Orphan // Corrected Import
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,7 +66,7 @@ fun PendingVerificationScreen(navController: NavController, orphanList: List<Orp
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp)
-                            .clickable { navController.navigate("profile/${orphan.id}") },
+                            .clickable { navController.navigate("profile/${orphan.documentId}") }, // Corrected Navigation
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Row(modifier = Modifier.padding(16.dp)) {
