@@ -10,7 +10,7 @@ import kotlinx.coroutines.tasks.await
 
 interface OrphanRepository {
     fun getOrphans(): Flow<List<Orphan>>
-    suspend fun addOrphan(orphan: Orphan)
+    suspend fun addOrphan(orphan: Orphan): String // Return the new document ID
     suspend fun updateOrphan(orphan: Orphan)
     suspend fun updateOrphanStatus(orphanId: String, newStatus: String)
 }
@@ -41,8 +41,9 @@ class OrphanRepositoryImpl : OrphanRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
-    override suspend fun addOrphan(orphan: Orphan) {
-        orphansCollection.add(orphan).await()
+    override suspend fun addOrphan(orphan: Orphan): String {
+        val documentReference = orphansCollection.add(orphan).await()
+        return documentReference.id
     }
 
     override suspend fun updateOrphan(orphan: Orphan) {

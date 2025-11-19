@@ -12,6 +12,7 @@ data class Orphan(
     @DocumentId val documentId: String = "",
     val name: String = "",
     val age: Int = 0,
+    val dateOfBirth: Date? = null,
     val gender: String = "",
     val enrollmentDate: String = "",
     var status: String = "Pending", // e.g., Pending, Active, Inactive

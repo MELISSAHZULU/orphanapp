@@ -1,6 +1,5 @@
 package com.example.orphanapp.ui
 
-import android.util.Log
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -9,14 +8,21 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.UserProfileChangeRequest
+import com.example.orphanapp.viewmodel.AuthViewModel
+import com.example.orphanapp.viewmodel.AuthState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun EditProfileScreen(navController: NavController) {
-    val currentUser = FirebaseAuth.getInstance().currentUser
-    var displayName by remember { mutableStateOf(currentUser?.displayName ?: "") }
+fun EditProfileScreen(navController: NavController, authViewModel: AuthViewModel) {
+    val authState by authViewModel.authState.collectAsState()
+    val user = (authState as? AuthState.Authenticated)?.user
+
+    var displayName by remember { mutableStateOf(user?.displayName ?: "") }
+
+    // Update the local state if the user data changes from the view model
+    LaunchedEffect(user) {
+        user?.let { displayName = it.displayName ?: "" }
+    }
 
     Scaffold(
         topBar = {
@@ -47,22 +53,11 @@ fun EditProfileScreen(navController: NavController) {
             Spacer(modifier = Modifier.height(24.dp))
             Button(
                 onClick = {
-                    val profileUpdates = UserProfileChangeRequest.Builder()
-                        .setDisplayName(displayName)
-                        .build()
-
-                    currentUser?.updateProfile(profileUpdates)?.addOnCompleteListener { task ->
-                        if (task.isSuccessful) {
-                            Log.d("EditProfile", "User profile updated.")
-                            // Navigate back to the profile screen to show the update
-                            navController.popBackStack()
-                        } else {
-                            Log.w("EditProfile", "Error updating profile.", task.exception)
-                            // Optionally, you could show an error message to the user here
-                        }
-                    }
+                    authViewModel.updateUserDisplayName(displayName)
+                    navController.popBackStack()
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                enabled = displayName.isNotBlank() // Prevent saving an empty name
             ) {
                 Text("Save Changes")
             }

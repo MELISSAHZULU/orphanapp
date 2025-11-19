@@ -160,7 +160,7 @@ fun OrphanageApp(
                     UserProfileScreen(navController, authViewModel)
                 }
                 composable("edit_profile") {
-                    EditProfileScreen(navController)
+                    EditProfileScreen(navController, authViewModel)
                 }
                 composable("change_password") {
                     ChangePasswordScreen(navController)

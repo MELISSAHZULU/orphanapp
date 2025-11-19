@@ -6,13 +6,18 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.orphanapp.data.Orphan
 import com.example.orphanapp.repository.OrphanRepository
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 class EnrollmentViewModel(private val repository: OrphanRepository) : ViewModel() {
+
+    private val _newlyCreatedOrphanId = MutableStateFlow<String?>(null)
+    val newlyCreatedOrphanId: StateFlow<String?> = _newlyCreatedOrphanId.asStateFlow()
 
     val orphans: StateFlow<List<Orphan>> = repository.getOrphans()
         .catch { exception ->
@@ -28,11 +33,17 @@ class EnrollmentViewModel(private val repository: OrphanRepository) : ViewModel(
     fun addOrphan(orphan: Orphan) {
         viewModelScope.launch {
             try {
-                repository.addOrphan(orphan)
+                val newId = repository.addOrphan(orphan)
+                _newlyCreatedOrphanId.value = newId
             } catch (e: Exception) {
                 Log.e("EnrollmentViewModel", "Failed to add orphan", e)
+                // Consider exposing an error state to the UI
             }
         }
+    }
+
+    fun onEnrollmentComplete() {
+        _newlyCreatedOrphanId.value = null
     }
 
     fun updateOrphan(orphan: Orphan) {

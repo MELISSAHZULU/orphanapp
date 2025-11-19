@@ -1,13 +1,8 @@
 package com.example.orphanapp.ui
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import android.app.DatePickerDialog
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -16,41 +11,50 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.orphanapp.data.Orphan
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
-import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnrollmentScreen(
     navController: NavController,
-    viewModel: EnrollmentViewModel,
-    onEnrollmentSuccess: (String) -> Unit
+    viewModel: EnrollmentViewModel
 ) {
     var name by remember { mutableStateOf("") }
-    var age by remember { mutableStateOf("") }
+    var dateOfBirth by remember { mutableStateOf<Date?>(null) }
     var gender by remember { mutableStateOf("") }
     var guardianName by remember { mutableStateOf("") }
     var schoolName by remember { mutableStateOf("") }
-    var ageInRange by remember { mutableStateOf(false) }
-    var storySummaryProvided by remember { mutableStateOf(false) }
-    var healthInfoProvided by remember { mutableStateOf(false) }
-    var residentialProgram by remember { mutableStateOf(false) }
-    var orphanStatusProvided by remember { mutableStateOf(false) }
-    var photoInserted by remember { mutableStateOf(false) }
+    var orphanStory by remember { mutableStateOf("") }
+    var healthRecords by remember { mutableStateOf("") }
 
-    val snackbarHostState = remember { SnackbarHostState() }
-    val scope = rememberCoroutineScope()
+    val newlyCreatedOrphanId by viewModel.newlyCreatedOrphanId.collectAsState()
+    
+    LaunchedEffect(newlyCreatedOrphanId) {
+        newlyCreatedOrphanId?.let {
+            navController.navigate("profile/$it") {
+                popUpTo("enrollment") { inclusive = true }
+            }
+            viewModel.onEnrollmentComplete() // Reset the state
+        }
+    }
+
+    val isFormValid = name.isNotBlank() && dateOfBirth != null && gender.isNotBlank() && 
+                      guardianName.isNotBlank() && orphanStory.isNotBlank() && healthRecords.isNotBlank()
 
     Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             TopAppBar(
-                title = { Text("Enrollment") },
-                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
+                title = { Text("Enroll New Orphan") },
+                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -67,73 +71,64 @@ fun EnrollmentScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Orphan Details", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
                         Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
+                        Spacer(modifier = Modifier.height(16.dp))
+                        
+                        DatePickerField(dateOfBirth) { dob -> dateOfBirth = dob }
+                        
                         Spacer(modifier = Modifier.height(16.dp))
                         Text("Select Gender", style = MaterialTheme.typography.bodyLarge, modifier = Modifier.fillMaxWidth())
                         Row {
-                            ChecklistItem(label = "Male", checked = gender == "Male", onCheckedChange = { gender = "Male" })
-                            ChecklistItem(label = "Female", checked = gender == "Female", onCheckedChange = { gender = "Female" })
+                            GenderSelector(label = "Male", selected = gender == "Male", onSelect = { gender = "Male" })
+                            GenderSelector(label = "Female", selected = gender == "Female", onSelect = { gender = "Female" })
                         }
                         Spacer(modifier = Modifier.height(16.dp))
-                        OutlinedTextField(value = guardianName, onValueChange = { guardianName = it }, label = { Text("Guardian Name") }, modifier = Modifier.fillMaxWidth(), shape = RoundedCornerShape(24.dp))
+                        OutlinedTextField(value = guardianName, onValueChange = { guardianName = it }, label = { Text("Guardian Name") }, modifier = Modifier.fillMaxWidth())
+                        Spacer(modifier = Modifier.height(16.dp))
+                         OutlinedTextField(value = schoolName, onValueChange = { schoolName = it }, label = { Text("School Name (Optional)") }, modifier = Modifier.fillMaxWidth())
                     }
                 }
             }
             item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Checklist", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        ChecklistItem(label = "Age between 1-18", checked = ageInRange, onCheckedChange = { ageInRange = it })
-                        ChecklistItem(label = "Summary of story provided", checked = storySummaryProvided, onCheckedChange = { storySummaryProvided = it })
-                        ChecklistItem(label = "Health information provided", checked = healthInfoProvided, onCheckedChange = { healthInfoProvided = it })
-                        ChecklistItem(label = "Residential Program Provided", checked = residentialProgram, onCheckedChange = { residentialProgram = it })
-                        ChecklistItem(label = "Orphan status provided", checked = orphanStatusProvided, onCheckedChange = { orphanStatusProvided = it })
-                        ChecklistItem(label = "Photo Inserted", checked = photoInserted, onCheckedChange = { photoInserted = it })
+                 Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
+                     Column(modifier = Modifier.padding(16.dp)) {
+                        Text("Required Information", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(value = orphanStory, onValueChange = { orphanStory = it }, label = { Text("Orphan Story") }, modifier = Modifier.fillMaxWidth().height(120.dp))
+                        Spacer(modifier = Modifier.height(16.dp))
+                        OutlinedTextField(value = healthRecords, onValueChange = { healthRecords = it }, label = { Text("Health Records") }, modifier = Modifier.fillMaxWidth().height(120.dp))
                     }
-                }
+                 }
             }
             item {
                 Button(
                     onClick = {
-                        val missingFields = mutableListOf<String>()
-                        if (name.isBlank()) missingFields.add("Name")
-                        if (age.isBlank()) missingFields.add("Age")
-                        if (gender.isBlank()) missingFields.add("Gender")
-                        if (guardianName.isBlank()) missingFields.add("Guardian Name")
-                        if (!ageInRange) missingFields.add("Age between 1-18")
-                        if (!storySummaryProvided) missingFields.add("Summary of story")
-                        if (!healthInfoProvided) missingFields.add("Health information")
-                        if (!residentialProgram) missingFields.add("Residential Program")
-                        if (!orphanStatusProvided) missingFields.add("Orphan status")
-                        if (!photoInserted) missingFields.add("Photo")
+                        val age = dateOfBirth?.let { calculateAge(it) } ?: 0
+                        val sdf = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+                        val enrollmentDate = sdf.format(Date())
 
-                        if (missingFields.isNotEmpty()) {
-                            scope.launch {
-                                snackbarHostState.showSnackbar("Enrollment Unsuccessful: Please provide ${missingFields.joinToString()}")
-                            }
-                        } else {
-                            val newOrphan = Orphan(
-                                name = name,
-                                age = age.toIntOrNull() ?: 0, // Safely convert age to Int
-                                gender = gender,
-                                guardianName = guardianName,
-                                schoolName = schoolName,
-                                status = "Pending"
-                            )
-                            viewModel.addOrphan(newOrphan)
-                            onEnrollmentSuccess(newOrphan.documentId)
-                        }
+                        val newOrphan = Orphan(
+                            name = name,
+                            age = age,
+                            dateOfBirth = dateOfBirth,
+                            gender = gender,
+                            guardianName = guardianName,
+                            schoolName = schoolName,
+                            status = "Pending",
+                            enrollmentDate = enrollmentDate,
+                            orphanStory = orphanStory,
+                            healthRecords = healthRecords
+                        )
+                        viewModel.addOrphan(newOrphan)
                     },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth().height(50.dp),
+                    enabled = isFormValid
                 ) {
-                    Text("Enroll")
+                    Text("Enroll Orphan", style = MaterialTheme.typography.bodyLarge)
                 }
             }
         }
@@ -141,14 +136,57 @@ fun EnrollmentScreen(
 }
 
 @Composable
-fun ChecklistItem(label: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit) {
-    Row(
-        modifier = Modifier
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Start
-    ) {
-        Checkbox(checked = checked, onCheckedChange = onCheckedChange)
+fun DatePickerField(selectedDate: Date?, onDateSelected: (Date) -> Unit) {
+    val context = LocalContext.current
+    val calendar = Calendar.getInstance()
+    selectedDate?.let { calendar.time = it }
+
+    val year = calendar.get(Calendar.YEAR)
+    val month = calendar.get(Calendar.MONTH)
+    val day = calendar.get(Calendar.DAY_OF_MONTH)
+
+    val dateFormat = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
+    val dateText = selectedDate?.let { dateFormat.format(it) } ?: "Select Date of Birth"
+
+    val datePickerDialog = DatePickerDialog(
+        context,
+        { _, selectedYear, selectedMonth, selectedDay ->
+            val newCalendar = Calendar.getInstance().apply {
+                set(selectedYear, selectedMonth, selectedDay)
+            }
+            onDateSelected(newCalendar.time)
+        }, year, month, day
+    )
+
+    OutlinedTextField(
+        value = dateText,
+        onValueChange = {}, 
+        label = { Text("Date of Birth") },
+        modifier = Modifier.fillMaxWidth().clickable { datePickerDialog.show() },
+        readOnly = true,
+        enabled = false, // To make it look like a button
+        colors = TextFieldDefaults.colors(
+            disabledTextColor = MaterialTheme.colorScheme.onSurface,
+            disabledLabelColor = MaterialTheme.colorScheme.onSurface
+        )
+    )
+}
+
+@Composable
+fun GenderSelector(label: String, selected: Boolean, onSelect: () -> Unit) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        RadioButton(selected = selected, onClick = onSelect)
         Text(label)
     }
+}
+
+fun calculateAge(birthDate: Date): Int {
+    val dob = Calendar.getInstance()
+    dob.time = birthDate
+    val today = Calendar.getInstance()
+    var age = today.get(Calendar.YEAR) - dob.get(Calendar.YEAR)
+    if (today.get(Calendar.DAY_OF_YEAR) < dob.get(Calendar.DAY_OF_YEAR)) {
+        age--
+    }
+    return age
 }

@@ -25,6 +25,10 @@ class FakeAuthRepository : AuthRepository {
         // Not implemented for fake repository
     }
 
+    override suspend fun updateUserDisplayName(displayName: String) {
+        // Not implemented for fake repository
+    }
+
     override fun signOut() {
         _authState.value = null
     }
