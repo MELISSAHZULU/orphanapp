@@ -6,6 +6,16 @@ import java.util.Date
 // This file is the single source of truth for all data models in the app.
 
 /**
+ * Represents a registered user in the system.
+ */
+data class User(
+    @DocumentId val uid: String = "",
+    val email: String? = null,
+    val displayName: String? = null,
+    val photoUrl: String? = null
+)
+
+/**
  * Represents a single orphan. The `documentId` is the unique ID from Firestore.
  */
 data class Orphan(
@@ -58,4 +68,13 @@ data class InventoryItem(
     @DocumentId val id: String = "",
     val name: String = "",
     val quantity: String = ""
+)
+
+/**
+ * Represents a single activity log entry. The `id` is the unique ID from Firestore.
+ */
+data class ActivityLog(
+    @DocumentId val id: String = "",
+    val description: String = "",
+    val timestamp: Date = Date()
 )

@@ -22,12 +22,13 @@ class MainActivity : ComponentActivity() {
     private val donationViewModel: DonationViewModel by viewModels { DonationViewModelFactory((application as OrphanApplication).donationRepository) }
     private val staffViewModel: StaffViewModel by viewModels { StaffViewModelFactory((application as OrphanApplication).staffRepository) }
     private val inventoryViewModel: InventoryViewModel by viewModels { InventoryViewModelFactory((application as OrphanApplication).inventoryRepository) }
+    private val activityLogViewModel: ActivityLogViewModel by viewModels { ActivityLogViewModelFactory((application as OrphanApplication).activityLogRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OrphanAppTheme {
-                OrphanageApp(authViewModel, enrollmentViewModel, donationViewModel, staffViewModel, inventoryViewModel)
+                OrphanageApp(authViewModel, enrollmentViewModel, donationViewModel, staffViewModel, inventoryViewModel, activityLogViewModel)
             }
         }
     }
@@ -39,7 +40,8 @@ fun OrphanageApp(
     enrollmentViewModel: EnrollmentViewModel,
     donationViewModel: DonationViewModel,
     staffViewModel: StaffViewModel,
-    inventoryViewModel: InventoryViewModel
+    inventoryViewModel: InventoryViewModel,
+    activityLogViewModel: ActivityLogViewModel
 ) {
     val navController = rememberNavController()
     val orphanList by enrollmentViewModel.orphans.collectAsState()
@@ -57,9 +59,7 @@ fun OrphanageApp(
                     DashboardScreen(navController, authViewModel, orphanList)
                 }
                 composable("enrollment") {
-                    EnrollmentScreen(navController, enrollmentViewModel) { newOrphanId ->
-                        navController.navigate("profile/$newOrphanId")
-                    }
+                    EnrollmentScreen(navController, enrollmentViewModel)
                 }
                 composable("tracking") {
                     TrackingScreen(orphanList, navController)
@@ -84,6 +84,11 @@ fun OrphanageApp(
                             navController.popBackStack()
                         }
                     )
+                }
+                composable("record_detail/{title}/{content}") { backStackEntry ->
+                    val title = backStackEntry.arguments?.getString("title")
+                    val content = backStackEntry.arguments?.getString("content")
+                    RecordDetailScreen(navController, title, content)
                 }
                 composable("checklist") {
                     ChecklistScreen(navController)
@@ -119,7 +124,7 @@ fun OrphanageApp(
                     AddPhotoScreen(navController)
                 }
                 composable("activity_log") {
-                    ActivityLogScreen(navController)
+                    ActivityLogScreen(navController, activityLogViewModel)
                 }
                 composable("donation") {
                     DonationScreen(navController, donationViewModel)
