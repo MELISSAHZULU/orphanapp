@@ -25,7 +25,7 @@ fun CommunicationScreen(navController: NavController) {
             )
         },
         floatingActionButton = {
-            FloatingActionButton(onClick = { navController.navigate("conversation/New Chat") }) {
+            FloatingActionButton(onClick = { navController.navigate("new_conversation") }) {
                 Icon(Icons.Default.Add, contentDescription = "New Conversation")
             }
         }
@@ -36,6 +36,7 @@ fun CommunicationScreen(navController: NavController) {
                 .padding(padding),
             contentAlignment = Alignment.Center
         ) {
+            // In a real app, you would show a list of existing conversations here.
             Text("No conversations yet. Tap '+' to start a new one.")
         }
     }

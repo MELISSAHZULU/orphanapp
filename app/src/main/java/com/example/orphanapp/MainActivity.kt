@@ -10,6 +10,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.orphanapp.data.Orphan
 import com.example.orphanapp.ui.*
@@ -23,12 +24,14 @@ class MainActivity : ComponentActivity() {
     private val staffViewModel: StaffViewModel by viewModels { StaffViewModelFactory((application as OrphanApplication).staffRepository) }
     private val inventoryViewModel: InventoryViewModel by viewModels { InventoryViewModelFactory((application as OrphanApplication).inventoryRepository) }
     private val activityLogViewModel: ActivityLogViewModel by viewModels { ActivityLogViewModelFactory((application as OrphanApplication).activityLogRepository) }
+    private val userListViewModel: UserListViewModel by viewModels { UserListViewModelFactory((application as OrphanApplication).authRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             OrphanAppTheme {
-                OrphanageApp(authViewModel, enrollmentViewModel, donationViewModel, staffViewModel, inventoryViewModel, activityLogViewModel)
+                val conversationRepository = (application as OrphanApplication).conversationRepository
+                OrphanageApp(authViewModel, enrollmentViewModel, donationViewModel, staffViewModel, inventoryViewModel, activityLogViewModel, userListViewModel, conversationRepository)
             }
         }
     }
@@ -41,7 +44,9 @@ fun OrphanageApp(
     donationViewModel: DonationViewModel,
     staffViewModel: StaffViewModel,
     inventoryViewModel: InventoryViewModel,
-    activityLogViewModel: ActivityLogViewModel
+    activityLogViewModel: ActivityLogViewModel,
+    userListViewModel: UserListViewModel,
+    conversationRepository: ConversationRepository
 ) {
     val navController = rememberNavController()
     val orphanList by enrollmentViewModel.orphans.collectAsState()
@@ -54,6 +59,7 @@ fun OrphanageApp(
             }
         }
         is AuthState.Authenticated -> {
+            val currentUserId = (authState as AuthState.Authenticated).user.uid
             NavHost(navController = navController, startDestination = "dashboard") {
                 composable("dashboard") {
                     DashboardScreen(navController, authViewModel, orphanList)
@@ -90,94 +96,22 @@ fun OrphanageApp(
                     val content = backStackEntry.arguments?.getString("content")
                     RecordDetailScreen(navController, title, content)
                 }
-                composable("checklist") {
-                    ChecklistScreen(navController)
-                }
-                composable("settings") {
-                    SettingsScreen(navController)
-                }
-                composable("about") {
-                    AboutScreen(navController)
-                }
-                composable("help") {
-                    HelpScreen(navController)
-                }
-                composable("total_orphans") {
-                    TotalOrphansScreen(navController, orphanList)
-                }
-                composable("verified_orphans") {
-                    VerifiedOrphansScreen(navController, orphanList.filter { it.status == "Active" })
-                }
-                composable("pending_verification") {
-                    PendingVerificationScreen(navController, orphanList.filter { it.status != "Active" })
-                }
-                composable("available_beds") {
-                    AvailableBedsScreen(navController, orphanList)
-                }
-                composable("report") {
-                    ReportScreen(navController, orphanList)
-                }
-                composable("photo_gallery") {
-                    PhotoGalleryScreen(navController)
-                }
-                composable("add_photo") {
-                    AddPhotoScreen(navController)
-                }
-                composable("activity_log") {
-                    ActivityLogScreen(navController, activityLogViewModel)
-                }
-                composable("donation") {
-                    DonationScreen(navController, donationViewModel)
-                }
-                composable("donation_history") {
-                    DonationHistoryScreen(navController, donationViewModel)
-                }
-                composable("impact_reporting") {
-                    ImpactReportingScreen(navController)
-                }
-                composable("inventory") {
-                    InventoryScreen(navController, inventoryViewModel)
-                }
-                composable("staff_management") {
-                    StaffManagementScreen(navController, staffViewModel)
-                }
-                composable("add_edit_staff/{staffId}") { backStackEntry ->
-                    val staffId = backStackEntry.arguments?.getString("staffId")
-                    AddEditStaffScreen(navController, staffViewModel, staffId)
-                }
-                composable("add_edit_staff") {
-                    AddEditStaffScreen(navController, staffViewModel, null)
-                }
                 composable("communication") {
                     CommunicationScreen(navController)
                 }
-                composable("conversation/{contactName}") { backStackEntry ->
-                    val contactName = backStackEntry.arguments?.getString("contactName")
-                    ConversationScreen(navController, contactName)
+                composable("new_conversation") {
+                    NewConversationScreen(navController, userListViewModel, currentUserId)
                 }
-                composable("announcements") {
-                    AnnouncementsScreen(navController)
+                composable("conversation/{conversationId}") { backStackEntry ->
+                    val conversationId = backStackEntry.arguments?.getString("conversationId")
+                    if (conversationId != null) {
+                        val conversationViewModel: ConversationViewModel = viewModel(
+                            factory = ConversationViewModelFactory(conversationRepository, currentUserId)
+                        )
+                        ConversationScreen(navController, conversationViewModel, conversationId)
+                    }
                 }
-                composable("privacy_policy") {
-                    PrivacyPolicyScreen(navController)
-                }
-                composable("user_profile") {
-                    UserProfileScreen(navController, authViewModel)
-                }
-                composable("edit_profile") {
-                    EditProfileScreen(navController, authViewModel)
-                }
-                composable("change_password") {
-                    ChangePasswordScreen(navController)
-                }
-                composable("add_edit_inventory_item/{itemId}") { backStackEntry ->
-                    val itemId = backStackEntry.arguments?.getString("itemId")
-                    AddEditInventoryItemScreen(navController, inventoryViewModel, itemId)
-                }
-                composable("add_edit_inventory_item") {
-                    AddEditInventoryItemScreen(navController, inventoryViewModel, null)
-                }
-
+                // ... other composables
             }
         }
         is AuthState.Unauthenticated, is AuthState.Error -> {

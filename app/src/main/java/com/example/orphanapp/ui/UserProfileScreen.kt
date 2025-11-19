@@ -21,9 +21,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
+import com.example.orphanapp.data.User // Corrected import
 import com.example.orphanapp.viewmodel.AuthState
 import com.example.orphanapp.viewmodel.AuthViewModel
-import com.example.orphanapp.viewmodel.User
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

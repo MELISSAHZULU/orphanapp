@@ -12,6 +12,7 @@ class OrphanApplication : Application() {
     lateinit var staffRepository: StaffRepository
     lateinit var inventoryRepository: InventoryRepository
     lateinit var activityLogRepository: ActivityLogRepository
+    lateinit var conversationRepository: ConversationRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -22,5 +23,6 @@ class OrphanApplication : Application() {
         staffRepository = StaffRepositoryImpl()
         inventoryRepository = InventoryRepositoryImpl()
         activityLogRepository = ActivityLogRepositoryImpl()
+        conversationRepository = ConversationRepositoryImpl()
     }
 }

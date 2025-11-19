@@ -5,12 +5,13 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
+import com.example.orphanapp.data.User // Import the centralized User class
 import com.example.orphanapp.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-data class User(val uid: String, val email: String?, val displayName: String?, val photoUrl: String?)
+// The User data class has been moved to data/Models.kt
 
 sealed class AuthState {
     object Loading : AuthState()
@@ -29,10 +30,10 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
             repository.authState.collect { firebaseUser ->
                 if (firebaseUser != null) {
                     val user = User(
-                        firebaseUser.uid, 
-                        firebaseUser.email, 
-                        firebaseUser.displayName, 
-                        firebaseUser.photoUrl?.toString()
+                        uid = firebaseUser.uid, 
+                        email = firebaseUser.email, 
+                        displayName = firebaseUser.displayName, 
+                        photoUrl = firebaseUser.photoUrl?.toString()
                     )
                     _authState.value = AuthState.Authenticated(user)
                 } else {

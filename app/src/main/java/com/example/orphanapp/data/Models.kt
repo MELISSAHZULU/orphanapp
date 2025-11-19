@@ -1,6 +1,7 @@
 package com.example.orphanapp.data
 
 import com.google.firebase.firestore.DocumentId
+import com.google.firebase.firestore.ServerTimestamp
 import java.util.Date
 
 // This file is the single source of truth for all data models in the app.
@@ -13,6 +14,16 @@ data class User(
     val email: String? = null,
     val displayName: String? = null,
     val photoUrl: String? = null
+)
+
+/**
+ * Represents a single message within a conversation.
+ */
+data class ChatMessage(
+    @DocumentId val id: String = "",
+    val senderId: String = "",
+    val text: String = "",
+    @ServerTimestamp val timestamp: Date? = null
 )
 
 /**

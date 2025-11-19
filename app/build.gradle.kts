@@ -56,6 +56,7 @@ dependencies {
     // Firebase
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
+    implementation("com.google.firebase:firebase-firestore-ktx") // Added KTX for snapshots()
     implementation(libs.firebase.auth)
     implementation(libs.firebase.storage)
 

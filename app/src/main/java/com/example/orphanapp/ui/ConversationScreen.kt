@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -14,32 +15,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.orphanapp.data.ChatMessage
+import com.example.orphanapp.viewmodel.AuthViewModel
 import com.example.orphanapp.viewmodel.ConversationViewModel
-
-data class ChatMessage(val message: String, val isFromMe: Boolean)
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ConversationScreen(
-    navController: NavController, 
-    contactName: String?,
-    conversationViewModel: ConversationViewModel = viewModel()
+    navController: NavController,
+    viewModel: ConversationViewModel,
+    conversationId: String
 ) {
     var messageText by remember { mutableStateOf("") }
-    val messages by conversationViewModel.messages.collectAsState()
+    val messages by viewModel.messages.collectAsState()
+    val listState = rememberLazyListState()
 
-    LaunchedEffect(contactName) {
-        contactName?.let { conversationViewModel.loadConversation(it) }
+    LaunchedEffect(conversationId) {
+        viewModel.loadMessages(conversationId)
+    }
+    
+    // Scroll to the bottom when a new message arrives
+    LaunchedEffect(messages) {
+        if (messages.isNotEmpty()) {
+            listState.animateScrollToItem(messages.size - 1)
+        }
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(contactName ?: "Chat") },
-                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
-                 colors = TopAppBarDefaults.topAppBarColors(
+                title = { Text("Conversation") }, // You might want to pass the other user's name here
+                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
+                colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
                     navigationIconContentColor = MaterialTheme.colorScheme.onPrimary
@@ -49,9 +58,7 @@ fun ConversationScreen(
         bottomBar = {
             BottomAppBar {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 8.dp, vertical = 4.dp),
+                    modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp, vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     OutlinedTextField(
@@ -63,7 +70,7 @@ fun ConversationScreen(
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = {
-                        conversationViewModel.sendMessage(messageText)
+                        viewModel.sendMessage(conversationId, messageText)
                         messageText = ""
                     }) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
@@ -73,23 +80,27 @@ fun ConversationScreen(
         }
     ) { padding ->
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
                 .padding(12.dp),
-            reverseLayout = true
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            items(messages.reversed()) { chatMessage ->
-                MessageBubble(chatMessage)
+            items(messages) { chatMessage ->
+                // You'll need to pass the current user's ID to determine if the message is from them
+                // For now, we'll assume a function in the ViewModel provides this info
+                val isFromMe = chatMessage.senderId == "some_current_user_id" // Replace with actual logic
+                MessageBubble(chatMessage, isFromMe)
             }
         }
     }
 }
 
 @Composable
-fun MessageBubble(chatMessage: ChatMessage) {
-    val horizontalArrangement = if (chatMessage.isFromMe) Arrangement.End else Arrangement.Start
-    val bubbleColor = if (chatMessage.isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
+fun MessageBubble(chatMessage: ChatMessage, isFromMe: Boolean) {
+    val horizontalArrangement = if (isFromMe) Arrangement.End else Arrangement.Start
+    val bubbleColor = if (isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -102,7 +113,7 @@ fun MessageBubble(chatMessage: ChatMessage) {
                 .background(bubbleColor)
                 .padding(12.dp)
         ) {
-            Text(text = chatMessage.message)
+            Text(text = chatMessage.text)
         }
     }
 }
