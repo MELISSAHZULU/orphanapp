@@ -1,5 +1,6 @@
 package com.example.orphanapp.viewmodel
 
+import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -9,9 +10,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-// Define the User data class locally within this file to avoid conflicts.
-// This is the single source of truth for the UI's User object.
-data class User(val uid: String, val email: String?, val displayName: String?)
+data class User(val uid: String, val email: String?, val displayName: String?, val photoUrl: String?)
 
 sealed class AuthState {
     object Loading : AuthState()
@@ -29,8 +28,12 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         viewModelScope.launch {
             repository.authState.collect { firebaseUser ->
                 if (firebaseUser != null) {
-                    // Map the official FirebaseUser to our local UI-specific User data class
-                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
+                    val user = User(
+                        firebaseUser.uid, 
+                        firebaseUser.email, 
+                        firebaseUser.displayName, 
+                        firebaseUser.photoUrl?.toString()
+                    )
                     _authState.value = AuthState.Authenticated(user)
                 } else {
                     _authState.value = AuthState.Unauthenticated
@@ -39,10 +42,29 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         }
     }
 
+    fun updateProfilePicture(uri: Uri) {
+        viewModelScope.launch {
+            try {
+                repository.updateProfilePicture(uri)
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error(e.message ?: "Profile update failed")
+            }
+        }
+    }
+
+    fun updateUserDisplayName(displayName: String) {
+        viewModelScope.launch {
+            try {
+                repository.updateUserDisplayName(displayName)
+            } catch (e: Exception) {
+                _authState.value = AuthState.Error(e.message ?: "Display name update failed")
+            }
+        }
+    }
+
     fun signIn(email: String, password: String) {
         viewModelScope.launch {
             try {
-                // The repository now returns a FirebaseUser, which we handle in the init collector.
                 repository.signIn(email, password)
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Sign in failed", e)
@@ -54,7 +76,6 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun register(email: String, password: String, displayName: String) {
         viewModelScope.launch {
             try {
-                // The repository now returns a FirebaseUser, which we handle in the init collector.
                 repository.register(email, password, displayName)
             } catch (e: Exception) {
                 Log.e("AuthViewModel", "Registration failed", e)

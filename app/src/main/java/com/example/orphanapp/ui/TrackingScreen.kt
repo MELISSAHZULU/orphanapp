@@ -27,7 +27,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.orphanapp.data.Orphan // Corrected Import
+import com.example.orphanapp.data.Orphan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -73,7 +73,13 @@ fun TrackingScreen(orphanList: List<Orphan>, navController: NavController) {
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { navController.navigate("profile/${orphan.documentId}") }, // Corrected Navigation
+                            .clickable { 
+                                if (orphan.status == "Pending") {
+                                    navController.navigate("pending_profile/${orphan.documentId}")
+                                } else {
+                                    navController.navigate("profile/${orphan.documentId}")
+                                }
+                            },
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
                     ) {
                         Row(

@@ -71,6 +71,20 @@ fun OrphanageApp(
                         enrollmentViewModel.updateOrphan(updatedOrphan)
                     }
                 }
+                 composable("pending_profile/{id}") { backStackEntry ->
+                    val id = backStackEntry.arguments?.getString("id")
+                    val orphan = orphanList.find { it.documentId == id }
+                    PendingProfileScreen(navController, orphan, 
+                        onAccept = { orphanId ->
+                            enrollmentViewModel.acceptOrphan(orphanId)
+                            navController.popBackStack()
+                        },
+                        onDecline = { orphanId ->
+                            enrollmentViewModel.declineOrphan(orphanId)
+                            navController.popBackStack()
+                        }
+                    )
+                }
                 composable("checklist") {
                     ChecklistScreen(navController)
                 }

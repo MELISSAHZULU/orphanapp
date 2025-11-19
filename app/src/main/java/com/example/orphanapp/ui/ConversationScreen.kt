@@ -14,19 +14,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
+import com.example.orphanapp.viewmodel.ConversationViewModel
 
 data class ChatMessage(val message: String, val isFromMe: Boolean)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ConversationScreen(navController: NavController, contactName: String?) {
+fun ConversationScreen(
+    navController: NavController, 
+    contactName: String?,
+    conversationViewModel: ConversationViewModel = viewModel()
+) {
     var messageText by remember { mutableStateOf("") }
-    val messages = remember { mutableStateListOf(
-        ChatMessage("Hello!", false),
-        ChatMessage("Hi there! How are you?", true),
-        ChatMessage("I'm doing well, thanks for asking!", false)
-    ) }
+    val messages by conversationViewModel.messages.collectAsState()
+
+    LaunchedEffect(contactName) {
+        contactName?.let { conversationViewModel.loadConversation(it) }
+    }
 
     Scaffold(
         topBar = {
@@ -57,10 +63,8 @@ fun ConversationScreen(navController: NavController, contactName: String?) {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     IconButton(onClick = {
-                        if (messageText.isNotBlank()) {
-                            messages.add(ChatMessage(messageText, true))
-                            messageText = ""
-                        }
+                        conversationViewModel.sendMessage(messageText)
+                        messageText = ""
                     }) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }

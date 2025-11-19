@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
-import com.example.orphanapp.data.Orphan // Corrected Import
+import com.example.orphanapp.data.Orphan
 import com.example.orphanapp.repository.OrphanRepository
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -41,6 +41,26 @@ class EnrollmentViewModel(private val repository: OrphanRepository) : ViewModel(
                 repository.updateOrphan(orphan)
             } catch (e: Exception) {
                 Log.e("EnrollmentViewModel", "Failed to update orphan", e)
+            }
+        }
+    }
+
+    fun acceptOrphan(orphanId: String) {
+        viewModelScope.launch {
+            try {
+                repository.updateOrphanStatus(orphanId, "Active")
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Failed to accept orphan", e)
+            }
+        }
+    }
+
+    fun declineOrphan(orphanId: String) {
+        viewModelScope.launch {
+            try {
+                repository.updateOrphanStatus(orphanId, "Declined")
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Failed to decline orphan", e)
             }
         }
     }

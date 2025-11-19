@@ -1,7 +1,7 @@
 package com.example.orphanapp.repository
 
 import android.util.Log
-import com.example.orphanapp.data.Orphan // This now correctly refers to the class in Models.kt
+import com.example.orphanapp.data.Orphan
 import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -12,6 +12,7 @@ interface OrphanRepository {
     fun getOrphans(): Flow<List<Orphan>>
     suspend fun addOrphan(orphan: Orphan)
     suspend fun updateOrphan(orphan: Orphan)
+    suspend fun updateOrphanStatus(orphanId: String, newStatus: String)
 }
 
 class OrphanRepositoryImpl : OrphanRepository {
@@ -27,8 +28,6 @@ class OrphanRepositoryImpl : OrphanRepository {
             }
             if (snapshot != null) {
                 try {
-                    // toObjects() automatically maps the documents to our data class.
-                    // The @DocumentId annotation in the Orphan class handles the ID.
                     val orphans = snapshot.toObjects(Orphan::class.java)
                     trySend(orphans)
                 } catch (e: Exception) {
@@ -43,16 +42,22 @@ class OrphanRepositoryImpl : OrphanRepository {
     }
 
     override suspend fun addOrphan(orphan: Orphan) {
-        // Firestore will automatically generate an ID for the new document.
         orphansCollection.add(orphan).await()
     }
 
     override suspend fun updateOrphan(orphan: Orphan) {
-        // We must have a documentId to update an existing orphan record.
         if (orphan.documentId.isNotEmpty()) {
             orphansCollection.document(orphan.documentId).set(orphan).await()
         } else {
             Log.w("OrphanRepository", "Cannot update orphan without a document ID.")
+        }
+    }
+
+    override suspend fun updateOrphanStatus(orphanId: String, newStatus: String) {
+        if (orphanId.isNotEmpty()) {
+            orphansCollection.document(orphanId).update("status", newStatus).await()
+        } else {
+             Log.w("OrphanRepository", "Cannot update orphan status without a document ID.")
         }
     }
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -47,7 +48,13 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                             Icon(Icons.Default.Edit, contentDescription = "Edit")
                         }
                     }
-                }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    navigationIconContentColor = MaterialTheme.colorScheme.onPrimary,
+                    actionIconContentColor = MaterialTheme.colorScheme.onPrimary
+                )
             )
         }
     ) { padding ->
@@ -163,7 +170,7 @@ fun EditProfileView(orphan: Orphan, onUpdate: (Orphan) -> Unit, onCancel: () -> 
                     status = status,
                     healthRecords = healthRecords,
                     orphanStory = orphanStory,
-                    sponsorInfo = sponsorInfo,
+                    sponsorInfo = sponsorInfo, // Corrected typo here
                     educationProgress = educationProgress
                 )
                 onUpdate(updatedOrphan)
