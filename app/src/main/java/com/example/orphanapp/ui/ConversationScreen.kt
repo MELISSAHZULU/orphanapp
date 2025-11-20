@@ -17,7 +17,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.orphanapp.data.ChatMessage
-import com.example.orphanapp.viewmodel.AuthViewModel
 import com.example.orphanapp.viewmodel.ConversationViewModel
 import kotlinx.coroutines.launch
 
@@ -31,15 +30,18 @@ fun ConversationScreen(
     var messageText by remember { mutableStateOf("") }
     val messages by viewModel.messages.collectAsState()
     val listState = rememberLazyListState()
+    val coroutineScope = rememberCoroutineScope()
 
     LaunchedEffect(conversationId) {
         viewModel.loadMessages(conversationId)
     }
-    
+
     // Scroll to the bottom when a new message arrives
-    LaunchedEffect(messages) {
+    LaunchedEffect(messages.size) {
         if (messages.isNotEmpty()) {
-            listState.animateScrollToItem(messages.size - 1)
+            coroutineScope.launch {
+                listState.animateScrollToItem(messages.size - 1)
+            }
         }
     }
 
@@ -69,10 +71,13 @@ fun ConversationScreen(
                         shape = RoundedCornerShape(24.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    IconButton(onClick = {
-                        viewModel.sendMessage(conversationId, messageText)
-                        messageText = ""
-                    }) {
+                    IconButton(
+                        onClick = {
+                            viewModel.sendMessage(conversationId, messageText)
+                            messageText = ""
+                        },
+                        enabled = messageText.isNotBlank()
+                    ) {
                         Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "Send")
                     }
                 }
@@ -84,13 +89,12 @@ fun ConversationScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(padding)
-                .padding(12.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+                .padding(horizontal = 12.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(vertical = 12.dp)
         ) {
             items(messages) { chatMessage ->
-                // You'll need to pass the current user's ID to determine if the message is from them
-                // For now, we'll assume a function in the ViewModel provides this info
-                val isFromMe = chatMessage.senderId == "some_current_user_id" // Replace with actual logic
+                val isFromMe = chatMessage.senderId == viewModel.currentUserId
                 MessageBubble(chatMessage, isFromMe)
             }
         }
@@ -99,21 +103,26 @@ fun ConversationScreen(
 
 @Composable
 fun MessageBubble(chatMessage: ChatMessage, isFromMe: Boolean) {
-    val horizontalArrangement = if (isFromMe) Arrangement.End else Arrangement.Start
-    val bubbleColor = if (isFromMe) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.secondaryContainer
-
     Row(
         modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = horizontalArrangement
+        horizontalArrangement = if (isFromMe) Arrangement.End else Arrangement.Start
     ) {
-        Box(
-            modifier = Modifier
-                .padding(vertical = 4.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(bubbleColor)
-                .padding(12.dp)
+        Card(
+            shape = RoundedCornerShape(
+                topStart = 16.dp,
+                topEnd = 16.dp,
+                bottomStart = if (isFromMe) 16.dp else 0.dp,
+                bottomEnd = if (isFromMe) 0.dp else 16.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = if (isFromMe) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondaryContainer
+            )
         ) {
-            Text(text = chatMessage.text)
+            Text(
+                text = chatMessage.text,
+                modifier = Modifier.padding(12.dp),
+                color = if (isFromMe) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSecondaryContainer
+            )
         }
     }
 }

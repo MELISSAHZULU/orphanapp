@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.orphanapp.data.Orphan
+import com.example.orphanapp.repository.ConversationRepository // <<< THE DEFINITIVE FIX: IMPORT THE REPOSITORY
 import com.example.orphanapp.ui.*
 import com.example.orphanapp.ui.theme.OrphanAppTheme
 import com.example.orphanapp.viewmodel.*

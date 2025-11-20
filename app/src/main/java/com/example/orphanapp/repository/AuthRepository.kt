@@ -6,6 +6,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.ktx.snapshots
 import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -38,7 +40,7 @@ class AuthRepositoryImpl : AuthRepository {
     }
 
     override fun getAllUsers(): Flow<List<User>> {
-        return usersCollection.snapshots().map { snapshot ->
+        return usersCollection.snapshots().map { snapshot: QuerySnapshot ->
             snapshot.toObjects(User::class.java)
         }
     }

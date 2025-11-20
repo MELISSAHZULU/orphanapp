@@ -3,6 +3,8 @@ package com.example.orphanapp.repository
 import com.example.orphanapp.data.ChatMessage
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.Query
+import com.google.firebase.firestore.QuerySnapshot
+import com.google.firebase.firestore.ktx.snapshots // <<< THE DEFINITIVE, FINAL FIX
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.tasks.await
@@ -21,8 +23,8 @@ class ConversationRepositoryImpl : ConversationRepository {
             .document(conversationId)
             .collection("messages")
             .orderBy("timestamp", Query.Direction.ASCENDING)
-            .snapshots()
-            .map { snapshot ->
+            .snapshots() // This will now resolve correctly
+            .map { snapshot: QuerySnapshot -> // Explicitly declare the type here
                 snapshot.toObjects(ChatMessage::class.java)
             }
     }

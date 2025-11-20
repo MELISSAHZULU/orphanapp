@@ -10,7 +10,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
-class ConversationViewModel(private val repository: ConversationRepository, private val currentUserId: String) : ViewModel() {
+class ConversationViewModel(
+    private val repository: ConversationRepository, 
+    val currentUserId: String // Made public
+) : ViewModel() {
 
     private val _messages = MutableStateFlow<List<ChatMessage>>(emptyList())
     val messages: StateFlow<List<ChatMessage>> = _messages

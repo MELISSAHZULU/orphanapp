@@ -26,7 +26,7 @@ fun ImpactReportingScreen(navController: NavController) {
         "Donations This Month" to "$8,500",
         "Volunteers Engaged" to "42"
     )
-    val chartData = listOf(
+    val chartData = alistOf(
         ChartData("Food & Water", 65f),
         ChartData("Healthcare", 15f),
         ChartData("Education", 10f),
