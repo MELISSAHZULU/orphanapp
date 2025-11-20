@@ -17,6 +17,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -24,24 +27,31 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.orphanapp.R
-import com.example.orphanapp.data.Orphan
+import com.example.orphanapp.viewmodel.EnrollmentViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PendingProfileScreen(
-    navController: NavController, 
-    orphan: Orphan?,
+    navController: NavController,
+    orphanId: String,
+    viewModel: EnrollmentViewModel,
     onAccept: (String) -> Unit,
     onDecline: (String) -> Unit
 ) {
+    // Fetch the specific orphan's details
+    LaunchedEffect(orphanId) {
+        viewModel.getOrphanById(orphanId)
+    }
+
+    val orphan by viewModel.selectedOrphan.collectAsState()
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (orphan != null) "Pending: ${orphan.name}" else "Loading...") },
+                title = { Text(if (orphan != null) "Pending: ${orphan?.name}" else "Loading...") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -66,7 +76,7 @@ fun PendingProfileScreen(
                 // Photo and Basic Info
                 Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
                     AsyncImage(
-                        model = orphan.photoUrl,
+                        model = orphan?.photoUrl,
                         contentDescription = "Orphan Photo",
                         modifier = Modifier
                             .size(150.dp)
@@ -76,43 +86,59 @@ fun PendingProfileScreen(
                         error = painterResource(R.drawable.ic_launcher_background)
                     )
                     Spacer(modifier = Modifier.height(16.dp))
-                    Text(orphan.name, style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
+                    Text(orphan?.name ?: "", style = MaterialTheme.typography.headlineMedium, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.height(8.dp))
                 }
 
-                InfoRow("Age", orphan.age.toString())
-                InfoRow("Gender", orphan.gender)
-                InfoRow("Enrollment Date", orphan.enrollmentDate)
-                InfoRow("Status", orphan.status)
+                InfoRow("Age", orphan?.age.toString())
+                InfoRow("Gender", orphan?.gender ?: "N/A")
+                InfoRow("Enrollment Date", orphan?.enrollmentDate ?: "N/A")
+                InfoRow("Status", orphan?.status ?: "N/A")
 
                 Spacer(modifier = Modifier.height(24.dp))
 
                 // Records
                 Text("Records", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-                RecordDetailView(title = "Health Records", content = orphan.healthRecords)
-                RecordDetailView(title = "Orphan Story", content = orphan.orphanStory)
-                RecordDetailView(title = "Sponsor Info", content = orphan.sponsorInfo)
-                RecordDetailView(title = "Education Progress", content = orphan.educationProgress)
-                RecordDetailView(title = "Donations Received", content = orphan.donationsReceived.joinToString("\n"))
+                RecordDetailView(title = "Health Records", content = orphan?.healthRecords ?: "N/A")
+                RecordDetailView(title = "Orphan Story", content = orphan?.orphanStory ?: "N/A")
+                RecordDetailView(title = "Sponsor Info", content = orphan?.sponsorInfo ?: "N/A")
+                RecordDetailView(title = "Education Progress", content = orphan?.educationProgress ?: "N/A")
+                RecordDetailView(title = "Donations Received", content = orphan?.donationsReceived?.joinToString("\n") ?: "N/A")
 
                 Spacer(modifier = Modifier.weight(1f))
 
                 // Accept and Decline Buttons
                 Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceEvenly) {
                     Button(
-                        onClick = { onAccept(orphan.documentId) },
+                        onClick = { onAccept(orphan!!.documentId) },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         Text("Accept")
                     }
                     Button(
-                        onClick = { onDecline(orphan.documentId) },
+                        onClick = { onDecline(orphan!!.documentId) },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
                     ) {
                         Text("Decline")
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+fun RecordDetailView(title: String, content: String) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(2.dp)
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Text(text = title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text(text = if (content.isNotBlank()) content else "N/A", style = MaterialTheme.typography.bodyMedium)
         }
     }
 }

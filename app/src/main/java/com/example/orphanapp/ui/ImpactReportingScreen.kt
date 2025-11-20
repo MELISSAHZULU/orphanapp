@@ -17,6 +17,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 
+data class ChartData(val label: String, val value: Float)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImpactReportingScreen(navController: NavController) {
@@ -26,7 +28,7 @@ fun ImpactReportingScreen(navController: NavController) {
         "Donations This Month" to "$8,500",
         "Volunteers Engaged" to "42"
     )
-    val chartData = alistOf(
+    val chartData = listOf(
         ChartData("Food & Water", 65f),
         ChartData("Healthcare", 15f),
         ChartData("Education", 10f),

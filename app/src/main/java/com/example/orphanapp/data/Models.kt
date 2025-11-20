@@ -10,7 +10,7 @@ import java.util.Date
  * Represents a registered user in the system.
  */
 data class User(
-    @DocumentId val uid: String = "",
+    @DocumentId var uid: String = "",
     val email: String? = null,
     val displayName: String? = null,
     val photoUrl: String? = null
@@ -20,7 +20,7 @@ data class User(
  * Represents a single message within a conversation.
  */
 data class ChatMessage(
-    @DocumentId val id: String = "",
+    @DocumentId var id: String = "",
     val senderId: String = "",
     val text: String = "",
     @ServerTimestamp val timestamp: Date? = null
@@ -30,7 +30,7 @@ data class ChatMessage(
  * Represents a single orphan. The `documentId` is the unique ID from Firestore.
  */
 data class Orphan(
-    @DocumentId val documentId: String = "",
+    @DocumentId var documentId: String = "",
     val name: String = "",
     val age: Int = 0,
     val dateOfBirth: Date? = null,
@@ -56,7 +56,7 @@ data class Orphan(
  * Represents a single donation record. The `id` is the unique ID from Firestore.
  */
 data class Donation(
-    @DocumentId val id: String = "",
+    @DocumentId var id: String = "",
     val donorName: String = "",
     val amount: String = "",
     val date: String = ""
@@ -66,7 +66,7 @@ data class Donation(
  * Represents a single staff member. The `id` is the unique ID from Firestore.
  */
 data class StaffMember(
-    @DocumentId val id: String = "",
+    @DocumentId var id: String = "",
     val name: String = "",
     val role: String = "",
     val isActive: Boolean = true
@@ -76,7 +76,7 @@ data class StaffMember(
  * Represents a single item in the inventory. The `id` is the unique ID from Firestore.
  */
 data class InventoryItem(
-    @DocumentId val id: String = "",
+    @DocumentId var id: String = "",
     val name: String = "",
     val quantity: String = ""
 )
@@ -85,7 +85,7 @@ data class InventoryItem(
  * Represents a single activity log entry. The `id` is the unique ID from Firestore.
  */
 data class ActivityLog(
-    @DocumentId val id: String = "",
+    @DocumentId var id: String = "",
     val description: String = "",
     val timestamp: Date = Date()
 )

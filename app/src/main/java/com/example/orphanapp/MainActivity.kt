@@ -13,7 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.*
 import com.example.orphanapp.data.Orphan
-import com.example.orphanapp.repository.ConversationRepository // <<< THE DEFINITIVE FIX: IMPORT THE REPOSITORY
+import com.example.orphanapp.repository.ConversationRepository
 import com.example.orphanapp.ui.*
 import com.example.orphanapp.ui.theme.OrphanAppTheme
 import com.example.orphanapp.viewmodel.*
@@ -72,16 +72,22 @@ fun OrphanageApp(
                     TrackingScreen(orphanList, navController)
                 }
                 composable("profile/{id}") { backStackEntry ->
-                    val id = backStackEntry.arguments?.getString("id")
-                    val orphan = orphanList.find { it.documentId == id }
-                    OrphanProfileScreen(navController, orphan) { updatedOrphan ->
-                        enrollmentViewModel.updateOrphan(updatedOrphan)
-                    }
+                    val id = backStackEntry.arguments?.getString("id")!!
+                    OrphanProfileScreen(
+                        navController = navController, 
+                        orphanId = id,
+                        viewModel = enrollmentViewModel, // Pass the ViewModel
+                        onUpdate = { updatedOrphan ->
+                            enrollmentViewModel.updateOrphan(updatedOrphan)
+                        }
+                    )
                 }
                  composable("pending_profile/{id}") { backStackEntry ->
-                    val id = backStackEntry.arguments?.getString("id")
-                    val orphan = orphanList.find { it.documentId == id }
-                    PendingProfileScreen(navController, orphan, 
+                    val id = backStackEntry.arguments?.getString("id")!!
+                    PendingProfileScreen(
+                        navController = navController, 
+                        orphanId = id,
+                        viewModel = enrollmentViewModel, // Pass the ViewModel
                         onAccept = { orphanId ->
                             enrollmentViewModel.acceptOrphan(orphanId)
                             navController.popBackStack()

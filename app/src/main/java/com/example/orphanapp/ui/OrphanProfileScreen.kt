@@ -1,5 +1,6 @@
 package com.example.orphanapp.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -20,21 +21,33 @@ import androidx.navigation.NavController
 import coil.compose.AsyncImage
 import com.example.orphanapp.R
 import com.example.orphanapp.data.Orphan
+import com.example.orphanapp.viewmodel.EnrollmentViewModel
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate: (Orphan) -> Unit) {
+fun OrphanProfileScreen(
+    navController: NavController, 
+    orphanId: String,
+    viewModel: EnrollmentViewModel, 
+    onUpdate: (Orphan) -> Unit
+) {
     var isEditing by remember { mutableStateOf(false) }
+
+    // Fetch the specific orphan's details
+    LaunchedEffect(orphanId) {
+        viewModel.getOrphanById(orphanId)
+    }
+    val orphan by viewModel.selectedOrphan.collectAsState()
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(if (orphan != null) "Profile: ${orphan.name}" else "Loading...") },
+                title = { Text(if (orphan != null) "Profile: ${orphan?.name}" else "Loading...") },
                 navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
                 actions = {
-                    if (!isEditing) {
+                    if (!isEditing && orphan != null) {
                         IconButton(onClick = { isEditing = true }) {
                             Icon(Icons.Default.Edit, contentDescription = "Edit")
                         }
@@ -47,21 +60,81 @@ fun OrphanProfileScreen(navController: NavController, orphan: Orphan?, onUpdate:
                     actionIconContentColor = MaterialTheme.colorScheme.onPrimary
                 )
             )
-        }
-    ) { padding ->
-        if (orphan == null) {
-            Box(modifier = Modifier.fillMaxSize().padding(padding), contentAlignment = Alignment.Center) {
-                CircularProgressIndicator()
+        },
+        content = { padding ->
+            Box(modifier = Modifier.padding(padding)) {
+                if (orphan == null) {
+                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                        CircularProgressIndicator()
+                    }
+                } else {
+                    if (isEditing) {
+                        EditProfileView(orphan = orphan!!, onUpdate = onUpdate, onCancel = { isEditing = false })
+                    } else {
+                        ViewProfileView(orphan = orphan!!, navController = navController)
+                    }
+                }
             }
-        } else {
-            if (isEditing) {
-                EditProfileView(orphan = orphan, onUpdate = onUpdate, onCancel = { isEditing = false })
-            } else {
-                ViewProfileView(orphan = orphan, navController = navController)
+        }
+    )
+}
+
+@Composable
+fun EditProfileView(orphan: Orphan, onUpdate: (Orphan) -> Unit, onCancel: () -> Unit) {
+    var name by remember { mutableStateOf(orphan.name) }
+    var age by remember { mutableStateOf(orphan.age.toString()) }
+    var gender by remember { mutableStateOf(orphan.gender) }
+    var healthRecords by remember { mutableStateOf(orphan.healthRecords) }
+    var orphanStory by remember { mutableStateOf(orphan.orphanStory) }
+    var sponsorInfo by remember { mutableStateOf(orphan.sponsorInfo) }
+    var educationProgress by remember { mutableStateOf(orphan.educationProgress) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        OutlinedTextField(value = name, onValueChange = { name = it }, label = { Text("Name") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = age, onValueChange = { age = it }, label = { Text("Age") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = gender, onValueChange = { gender = it }, label = { Text("Gender") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(16.dp))
+        Text("Records", style = MaterialTheme.typography.titleLarge)
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = healthRecords, onValueChange = { healthRecords = it }, label = { Text("Health Records") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = orphanStory, onValueChange = { orphanStory = it }, label = { Text("Orphan Story") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = sponsorInfo, onValueChange = { sponsorInfo = it }, label = { Text("Sponsor Info") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(value = educationProgress, onValueChange = { educationProgress = it }, label = { Text("Education Progress") }, modifier = Modifier.fillMaxWidth())
+        Spacer(modifier = Modifier.height(24.dp))
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.End) {
+            Button(onClick = onCancel) {
+                Text("Cancel")
+            }
+            Spacer(modifier = Modifier.width(8.dp))
+            Button(onClick = {
+                val updatedOrphan = orphan.copy(
+                    name = name,
+                    age = age.toIntOrNull() ?: orphan.age,
+                    gender = gender,
+                    healthRecords = healthRecords,
+                    orphanStory = orphanStory,
+                    sponsorInfo = sponsorInfo,
+                    educationProgress = educationProgress
+                )
+                onUpdate(updatedOrphan)
+                onCancel() // To exit edit mode
+            }) {
+                Text("Save")
             }
         }
     }
 }
+
 
 @Composable
 fun ViewProfileView(orphan: Orphan, navController: NavController) {
@@ -93,12 +166,12 @@ fun ViewProfileView(orphan: Orphan, navController: NavController) {
         Spacer(modifier = Modifier.height(24.dp))
 
         Text("Records", style = MaterialTheme.typography.titleLarge, fontWeight = FontWeight.Bold, modifier = Modifier.padding(bottom = 8.dp))
-        
+
         RecordLink(navController, "Health Records", orphan.healthRecords)
         RecordLink(navController, "Orphan Story", orphan.orphanStory)
         RecordLink(navController, "Sponsor Info", orphan.sponsorInfo)
         RecordLink(navController, "Education Progress", orphan.educationProgress)
-        
+
         Spacer(modifier = Modifier.weight(1f))
 
         Button(onClick = { navController.popBackStack() }, modifier = Modifier.fillMaxWidth()) {
@@ -111,11 +184,14 @@ fun ViewProfileView(orphan: Orphan, navController: NavController) {
 fun RecordLink(navController: NavController, title: String, content: String) {
     val encodedContent = URLEncoder.encode(content, StandardCharsets.UTF_8.toString())
     Card(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 4.dp).clickable { 
-            if (content.isNotBlank()) {
-                 navController.navigate("record_detail/$title/$encodedContent")
-            }
-        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .clickable {
+                if (content.isNotBlank()) {
+                    navController.navigate("record_detail/$title/$encodedContent")
+                }
+            },
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
         Row(modifier = Modifier.padding(16.dp), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceBetween) {
@@ -124,6 +200,3 @@ fun RecordLink(navController: NavController, title: String, content: String) {
         }
     }
 }
-
-// The EditProfileView and other helper composables remain the same as before.
-// ... (Add the existing EditProfileView and InfoRow composables here)
