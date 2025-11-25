@@ -11,7 +11,7 @@ import kotlinx.coroutines.tasks.await
 interface OrphanRepository {
     fun getOrphans(): Flow<List<Orphan>>
     suspend fun getOrphanById(orphanId: String): Orphan?
-    suspend fun addOrphan(orphan: Orphan): String?
+    suspend fun addOrphan(orphan: Orphan): String
     suspend fun updateOrphan(orphan: Orphan)
     suspend fun updateOrphanStatus(orphanId: String, newStatus: String)
 }
@@ -23,28 +23,22 @@ class OrphanRepositoryImpl : OrphanRepository {
     override fun getOrphans(): Flow<List<Orphan>> {
         return orphansCollection.snapshots().map { snapshot ->
             snapshot.documents.mapNotNull { document ->
-                val orphan = document.toObject<Orphan>()
-                orphan?.apply { documentId = document.id }
+                document.toObject<Orphan>()?.copy(documentId = document.id)
             }
         }
     }
 
     override suspend fun getOrphanById(orphanId: String): Orphan? {
         return try {
-            val document = orphansCollection.document(orphanId).get().await()
-            document.toObject<Orphan>()?.apply { documentId = document.id }
+            orphansCollection.document(orphanId).get().await().toObject<Orphan>()?.copy(documentId = orphanId)
         } catch (e: Exception) {
             null
         }
     }
 
-    override suspend fun addOrphan(orphan: Orphan): String? {
-        return try {
-            val documentReference = orphansCollection.add(orphan).await()
-            documentReference.id
-        } catch (e: Exception) {
-            null
-        }
+    override suspend fun addOrphan(orphan: Orphan): String {
+        val documentReference = orphansCollection.add(orphan).await()
+        return documentReference.id
     }
 
     override suspend fun updateOrphan(orphan: Orphan) {
