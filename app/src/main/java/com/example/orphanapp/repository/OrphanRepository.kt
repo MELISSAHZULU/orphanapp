@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 interface OrphanRepository {
-    fun getOrphans(): Flow<List<Orphan>>
+    fun getOrphans(organizationId: String): Flow<List<Orphan>>
     suspend fun addOrphan(orphan: Orphan)
     suspend fun updateOrphan(orphan: Orphan)
 }
@@ -18,8 +18,10 @@ class OrphanRepositoryImpl : OrphanRepository {
     private val firestore = FirebaseFirestore.getInstance()
     private val orphansCollection = firestore.collection("orphans")
 
-    override fun getOrphans(): Flow<List<Orphan>> = callbackFlow {
-        val listenerRegistration = orphansCollection.addSnapshotListener { snapshot, error ->
+    override fun getOrphans(organizationId: String): Flow<List<Orphan>> = callbackFlow {
+        val listenerRegistration = orphansCollection
+            .whereEqualTo("organizationId", organizationId)
+            .addSnapshotListener { snapshot, error ->
             if (error != null) {
                 Log.w("OrphanRepository", "Listen error", error)
                 close(error)

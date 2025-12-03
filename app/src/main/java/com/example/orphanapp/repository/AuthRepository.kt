@@ -3,6 +3,8 @@ package com.example.orphanapp.repository
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -13,10 +15,12 @@ interface AuthRepository {
     suspend fun signIn(email: String, password: String): FirebaseUser?
     suspend fun register(email: String, password: String, displayName: String): FirebaseUser?
     fun signOut()
+    suspend fun getUserDocument(uid: String): DocumentSnapshot?
 }
 
 class AuthRepositoryImpl : AuthRepository {
     private val firebaseAuth = FirebaseAuth.getInstance()
+    private val firestore = FirebaseFirestore.getInstance()
 
     override val authState: Flow<FirebaseUser?> = callbackFlow {
         val authStateListener = FirebaseAuth.AuthStateListener { auth ->
@@ -45,5 +49,9 @@ class AuthRepositoryImpl : AuthRepository {
 
     override fun signOut() {
         firebaseAuth.signOut()
+    }
+
+    override suspend fun getUserDocument(uid: String): DocumentSnapshot? {
+        return firestore.collection("users").document(uid).get().await()
     }
 }

@@ -11,7 +11,7 @@ import kotlinx.coroutines.launch
 
 // Define the User data class locally within this file to avoid conflicts.
 // This is the single source of truth for the UI's User object.
-data class User(val uid: String, val email: String?, val displayName: String?)
+data class User(val uid: String, val email: String?, val displayName: String?, val organizationId: String?)
 
 sealed class AuthState {
     object Loading : AuthState()
@@ -29,8 +29,10 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         viewModelScope.launch {
             repository.authState.collect { firebaseUser ->
                 if (firebaseUser != null) {
+                    val userDocument = repository.getUserDocument(firebaseUser.uid)
+                    val organizationId = userDocument?.getString("organizationId")
                     // Map the official FirebaseUser to our local UI-specific User data class
-                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName)
+                    val user = User(firebaseUser.uid, firebaseUser.email, firebaseUser.displayName, organizationId)
                     _authState.value = AuthState.Authenticated(user)
                 } else {
                     _authState.value = AuthState.Unauthenticated
