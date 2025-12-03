@@ -65,6 +65,7 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     fun signOut() {
         repository.signOut()
+        _authState.value = AuthState.Unauthenticated
     }
 }
 
