@@ -25,24 +25,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import com.example.orphanapp.data.Orphan // Corrected Import
+import com.example.orphanapp.data.Orphan
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ReportScreen(navController: NavController, orphanList: List<Orphan>) {
     val totalOrphans = orphanList.size
-    val verifiedOrphans = orphanList.count { it.status == "Active" }
-    val pendingVerification = totalOrphans - verifiedOrphans
-    val totalBeds = 100
-    val availableBeds = totalBeds - verifiedOrphans
-    val inventoryItems = listOf("Rice", "T-shirts", "Notebooks", "Soap") // Placeholder
-    val activityLog = listOf("John Doe visited the orphanage.", "New donation of clothes received.") // Placeholder
+    val activeOrphans = orphanList.count { it.status == "Active" }
+    val pendingOrphans = orphanList.count { it.status == "Pending" }
+    val declinedOrphans = orphanList.count { it.status == "Declined" }
+    val maleOrphans = orphanList.count { it.gender == "Male" }
+    val femaleOrphans = orphanList.count { it.gender == "Female" }
 
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text("Report Summary") },
-                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Back") } },
+                navigationIcon = { IconButton(onClick = { navController.popBackStack() }) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back") } },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary,
@@ -59,46 +58,24 @@ fun ReportScreen(navController: NavController, orphanList: List<Orphan>) {
                 .padding(16.dp)
         ) {
             item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(2.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
                         Text("Orphan Statistics", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
                         Text("Total Orphans: $totalOrphans")
-                        Text("Verified & Admitted: $verifiedOrphans")
-                        Text("Pending Verification: $pendingVerification")
+                        Text("Active Orphans: $activeOrphans")
+                        Text("Pending Verification: $pendingOrphans")
+                        Text("Declined Applications: $declinedOrphans")
                     }
                 }
             }
             item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
+                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(2.dp)) {
                     Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Bed Occupancy", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+                        Text("Gender Distribution", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
                         Spacer(modifier = Modifier.height(8.dp))
-                        Text("Total Beds: $totalBeds")
-                        Text("Occupied Beds: $verifiedOrphans")
-                        Text("Available Beds: $availableBeds")
-                    }
-                }
-            }
-            item {
-                Card(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Inventory Summary", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        inventoryItems.forEach { item ->
-                            Text(item)
-                        }
-                    }
-                }
-            }
-            item {
-                Card(modifier = Modifier.fillMaxWidth(), elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)) {
-                    Column(modifier = Modifier.padding(16.dp)) {
-                        Text("Recent Activity", style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
-                        Spacer(modifier = Modifier.height(8.dp))
-                        activityLog.forEach { log ->
-                            Text(log)
-                        }
+                        Text("Male: $maleOrphans")
+                        Text("Female: $femaleOrphans")
                     }
                 }
             }
