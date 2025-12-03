@@ -10,8 +10,10 @@ import kotlinx.coroutines.tasks.await
 
 interface OrphanRepository {
     fun getOrphans(organizationId: String): Flow<List<Orphan>>
-    suspend fun addOrphan(orphan: Orphan)
+    suspend fun addOrphan(orphan: Orphan): String
     suspend fun updateOrphan(orphan: Orphan)
+    suspend fun getOrphanById(orphanId: String): Orphan?
+    suspend fun updateOrphanStatus(orphanId: String, status: String)
 }
 
 class OrphanRepositoryImpl : OrphanRepository {
@@ -44,9 +46,10 @@ class OrphanRepositoryImpl : OrphanRepository {
         awaitClose { listenerRegistration.remove() }
     }
 
-    override suspend fun addOrphan(orphan: Orphan) {
+    override suspend fun addOrphan(orphan: Orphan): String {
         // Firestore will automatically generate an ID for the new document.
-        orphansCollection.add(orphan).await()
+        val documentReference = orphansCollection.add(orphan).await()
+        return documentReference.id
     }
 
     override suspend fun updateOrphan(orphan: Orphan) {
@@ -55,6 +58,25 @@ class OrphanRepositoryImpl : OrphanRepository {
             orphansCollection.document(orphan.documentId).set(orphan).await()
         } else {
             Log.w("OrphanRepository", "Cannot update orphan without a document ID.")
+        }
+    }
+
+    override suspend fun getOrphanById(orphanId: String): Orphan? {
+        return try {
+            val snapshot = orphansCollection.document(orphanId).get().await()
+            snapshot.toObject(Orphan::class.java)
+        } catch (e: Exception) {
+            Log.e("OrphanRepository", "Error getting orphan by ID", e)
+            null
+        }
+    }
+
+    override suspend fun updateOrphanStatus(orphanId: String, status: String) {
+        try {
+            orphansCollection.document(orphanId).update("status", status).await()
+        } catch (e: Exception) {
+            Log.e("OrphanRepository", "Error updating orphan status", e)
+            throw e
         }
     }
 }

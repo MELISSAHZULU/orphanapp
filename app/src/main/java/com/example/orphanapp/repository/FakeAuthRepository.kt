@@ -3,6 +3,7 @@ package com.example.orphanapp.repository
 import android.net.Uri
 import com.example.orphanapp.data.User
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -15,6 +16,11 @@ class FakeAuthRepository : AuthRepository {
 
     override fun getAllUsers(): Flow<List<User>> {
         return flowOf(emptyList()) // Implemented the missing function
+    }
+
+    override suspend fun getUserDocument(uid: String): DocumentSnapshot? {
+        // Not implemented for fake repository, so we return null.
+        return null
     }
 
     override suspend fun signIn(email: String, password: String): FirebaseUser? {

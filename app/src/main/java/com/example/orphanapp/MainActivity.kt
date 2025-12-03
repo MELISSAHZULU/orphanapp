@@ -53,50 +53,61 @@ fun OrphanageApp(
     val orphanList by enrollmentViewModel.orphans.collectAsState()
     val authState by authViewModel.authState.collectAsState()
 
-    when (authState) {
+    when (val state = authState) {
         is AuthState.Loading -> {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
         is AuthState.Authenticated -> {
-            val currentUserId = (authState as AuthState.Authenticated).user.uid
+            // When the user is authenticated, check for their organizationId and load the orphans.
+            LaunchedEffect(state.user.organizationId) {
+                state.user.organizationId?.let { orgId ->
+                    if (orgId.isNotBlank()) {
+                        enrollmentViewModel.loadOrphansForOrganization(orgId)
+                    }
+                }
+            }
+
+            val currentUserId = state.user.uid
             NavHost(navController = navController, startDestination = "dashboard") {
                 composable("dashboard") {
                     DashboardScreen(navController, authViewModel, orphanList)
                 }
                 composable("enrollment") {
-                    EnrollmentScreen(navController, enrollmentViewModel)
+                    EnrollmentScreen(navController, enrollmentViewModel, authViewModel)
                 }
                 composable("tracking") {
                     TrackingScreen(orphanList, navController)
                 }
                 composable("profile/{id}") { backStackEntry ->
-                    val id = backStackEntry.arguments?.getString("id")!!
-                    OrphanProfileScreen(
-                        navController = navController, 
-                        orphanId = id,
-                        viewModel = enrollmentViewModel, // Pass the ViewModel
-                        onUpdate = { updatedOrphan ->
-                            enrollmentViewModel.updateOrphan(updatedOrphan)
-                        }
-                    )
+                    backStackEntry.arguments?.getString("id")?.let { id ->
+                        OrphanProfileScreen(
+                            navController = navController,
+                            orphanId = id,
+                            viewModel = enrollmentViewModel, // Pass the ViewModel
+                            onUpdate = { updatedOrphan ->
+                                enrollmentViewModel.updateOrphan(updatedOrphan)
+                            }
+                        )
+                    }
                 }
                  composable("pending_profile/{id}") { backStackEntry ->
-                    val id = backStackEntry.arguments?.getString("id")!!
-                    PendingProfileScreen(
-                        navController = navController, 
-                        orphanId = id,
-                        viewModel = enrollmentViewModel, // Pass the ViewModel
-                        onAccept = { orphanId ->
-                            enrollmentViewModel.acceptOrphan(orphanId)
-                            navController.popBackStack()
-                        },
-                        onDecline = { orphanId ->
-                            enrollmentViewModel.declineOrphan(orphanId)
-                            navController.popBackStack()
-                        }
-                    )
+                    backStackEntry.arguments?.getString("id")?.let { id ->
+                        PendingProfileScreen(
+                            navController = navController,
+                            orphanId = id,
+                            viewModel = enrollmentViewModel, // Pass the ViewModel
+                            onAccept = { orphanId ->
+                                enrollmentViewModel.acceptOrphan(orphanId)
+                                navController.popBackStack()
+                            },
+                            onDecline = { orphanId ->
+                                enrollmentViewModel.declineOrphan(orphanId)
+                                navController.popBackStack()
+                            }
+                        )
+                    }
                 }
                 composable("record_detail/{title}/{content}") { backStackEntry ->
                     val title = backStackEntry.arguments?.getString("title")

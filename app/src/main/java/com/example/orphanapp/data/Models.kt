@@ -13,7 +13,8 @@ data class User(
     @DocumentId var uid: String = "",
     val email: String? = null,
     val displayName: String? = null,
-    val photoUrl: String? = null
+    val photoUrl: String? = null,
+    val organizationId: String? = null // Added for multi-tenancy
 )
 
 /**
@@ -38,6 +39,7 @@ data class Orphan(
     val enrollmentDate: String = "",
     var status: String = "Pending", // e.g., Pending, Active, Inactive
     val photoUrl: String? = null,
+    val organizationId: String = "", // Added for multi-tenancy
 
     // Records
     val healthRecords: String = "",

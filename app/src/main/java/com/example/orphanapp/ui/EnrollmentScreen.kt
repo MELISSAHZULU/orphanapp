@@ -15,6 +15,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.orphanapp.data.Orphan
+import com.example.orphanapp.viewmodel.AuthState
+import com.example.orphanapp.viewmodel.AuthViewModel
 import com.example.orphanapp.viewmodel.EnrollmentViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -25,7 +27,8 @@ import java.util.Locale
 @Composable
 fun EnrollmentScreen(
     navController: NavController,
-    viewModel: EnrollmentViewModel
+    viewModel: EnrollmentViewModel,
+    authViewModel: AuthViewModel
 ) {
     var name by remember { mutableStateOf("") }
     var dateOfBirth by remember { mutableStateOf<Date?>(null) }
@@ -36,6 +39,8 @@ fun EnrollmentScreen(
     var healthRecords by remember { mutableStateOf("") }
 
     val newlyCreatedOrphanId by viewModel.newlyCreatedOrphanId.collectAsState()
+    val authState by authViewModel.authState.collectAsState()
+    val user = (authState as? AuthState.Authenticated)?.user
 
     LaunchedEffect(newlyCreatedOrphanId) {
         newlyCreatedOrphanId?.let {
@@ -47,7 +52,7 @@ fun EnrollmentScreen(
     }
 
     val isFormValid = name.isNotBlank() && dateOfBirth != null && gender.isNotBlank() &&
-            guardianName.isNotBlank() && orphanStory.isNotBlank() && healthRecords.isNotBlank()
+            guardianName.isNotBlank() && orphanStory.isNotBlank() && healthRecords.isNotBlank() && !user?.organizationId.isNullOrBlank()
 
     Scaffold(
         topBar = {
@@ -109,6 +114,7 @@ fun EnrollmentScreen(
                         val age = dateOfBirth?.let { calculateAge(it) } ?: 0
                         val sdf = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
                         val enrollmentDate = sdf.format(Date())
+                        val orgId = user?.organizationId ?: return@Button
 
                         val newOrphan = Orphan(
                             documentId = "", // Firestore will generate this
@@ -119,6 +125,7 @@ fun EnrollmentScreen(
                             enrollmentDate = enrollmentDate,
                             status = "Pending",
                             photoUrl = null, // Set a default value
+                            organizationId = orgId,
                             healthRecords = healthRecords,
                             orphanStory = orphanStory,
                             donationsReceived = emptyList(), // Set a default value

@@ -1,5 +1,6 @@
 package com.example.orphanapp.repository
 
+import android.net.Uri
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.auth.ktx.userProfileChangeRequest
@@ -16,6 +17,9 @@ interface AuthRepository {
     suspend fun register(email: String, password: String, displayName: String): FirebaseUser?
     fun signOut()
     suspend fun getUserDocument(uid: String): DocumentSnapshot?
+    fun getAllUsers(): Flow<List<com.example.orphanapp.data.User>>
+    suspend fun updateUserDisplayName(displayName: String)
+    suspend fun updateProfilePicture(uri: Uri)
 }
 
 class AuthRepositoryImpl : AuthRepository {
@@ -53,5 +57,41 @@ class AuthRepositoryImpl : AuthRepository {
 
     override suspend fun getUserDocument(uid: String): DocumentSnapshot? {
         return firestore.collection("users").document(uid).get().await()
+    }
+
+    override fun getAllUsers(): Flow<List<com.example.orphanapp.data.User>> = callbackFlow {
+        val listenerRegistration = firestore.collection("users")
+            .addSnapshotListener { snapshot, error ->
+                if (error != null) {
+                    close(error)
+                    return@addSnapshotListener
+                }
+                if (snapshot != null) {
+                    val users = snapshot.toObjects(com.example.orphanapp.data.User::class.java)
+                    trySend(users)
+                } else {
+                    trySend(emptyList())
+                }
+            }
+        awaitClose { listenerRegistration.remove() }
+    }
+    override suspend fun updateUserDisplayName(displayName: String) {
+        val user = firebaseAuth.currentUser
+        if (user != null) {
+            val profileUpdates = userProfileChangeRequest {
+                this.displayName = displayName
+            }
+            user.updateProfile(profileUpdates).await()
+        }
+    }
+
+    override suspend fun updateProfilePicture(uri: Uri) {
+        val user = firebaseAuth.currentUser
+        if (user != null) {
+            val profileUpdates = userProfileChangeRequest {
+                this.photoUri = uri
+            }
+            user.updateProfile(profileUpdates).await()
+        }
     }
 }

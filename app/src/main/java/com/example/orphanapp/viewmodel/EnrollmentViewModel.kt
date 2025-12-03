@@ -1,5 +1,6 @@
 package com.example.orphanapp.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
@@ -8,6 +9,7 @@ import com.example.orphanapp.repository.OrphanRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.launch
 
 class EnrollmentViewModel(private val orphanRepository: OrphanRepository) : ViewModel() {
@@ -21,18 +23,32 @@ class EnrollmentViewModel(private val orphanRepository: OrphanRepository) : View
     private val _newlyCreatedOrphanId = MutableStateFlow<String?>(null)
     val newlyCreatedOrphanId: StateFlow<String?> = _newlyCreatedOrphanId.asStateFlow()
 
-    init {
+    fun loadOrphansForOrganization(organizationId: String) {
         viewModelScope.launch {
-            orphanRepository.getOrphans().collect { orphanList ->
-                _orphans.value = orphanList
+            if (organizationId.isNotBlank()) {
+                orphanRepository.getOrphans(organizationId)
+                    .catch { e ->
+                        Log.e("EnrollmentViewModel", "Error loading orphans", e)
+                        // Optionally expose an error state to the UI
+                    }
+                    .collect { orphanList ->
+                        _orphans.value = orphanList
+                    }
+            } else {
+                _orphans.value = emptyList()
             }
         }
     }
 
     fun addOrphan(orphan: Orphan) {
         viewModelScope.launch {
-            val newOrphanId = orphanRepository.addOrphan(orphan)
-            _newlyCreatedOrphanId.value = newOrphanId
+            try {
+                val newOrphanId = orphanRepository.addOrphan(orphan)
+                _newlyCreatedOrphanId.value = newOrphanId
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Error adding orphan", e)
+                // Optionally expose an error state to the UI
+            }
         }
     }
 
@@ -42,25 +58,45 @@ class EnrollmentViewModel(private val orphanRepository: OrphanRepository) : View
 
     fun getOrphanById(orphanId: String) {
         viewModelScope.launch {
-            _selectedOrphan.value = orphanRepository.getOrphanById(orphanId)
+            try {
+                _selectedOrphan.value = orphanRepository.getOrphanById(orphanId)
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Error fetching orphan by ID", e)
+                _selectedOrphan.value = null // Reset on error
+            }
         }
     }
 
     fun updateOrphan(orphan: Orphan) {
         viewModelScope.launch {
-            orphanRepository.updateOrphan(orphan)
+            try {
+                orphanRepository.updateOrphan(orphan)
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Error updating orphan", e)
+                // Optionally expose an error state to the UI
+            }
         }
     }
 
     fun acceptOrphan(orphanId: String) {
         viewModelScope.launch {
-            orphanRepository.updateOrphanStatus(orphanId, "Enrolled")
+            try {
+                orphanRepository.updateOrphanStatus(orphanId, "Enrolled")
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Error accepting orphan", e)
+                // Optionally expose an error state to the UI
+            }
         }
     }
 
     fun declineOrphan(orphanId: String) {
         viewModelScope.launch {
-            orphanRepository.updateOrphanStatus(orphanId, "Declined")
+            try {
+                orphanRepository.updateOrphanStatus(orphanId, "Declined")
+            } catch (e: Exception) {
+                Log.e("EnrollmentViewModel", "Error declining orphan", e)
+                // Optionally expose an error state to the UI
+            }
         }
     }
 }

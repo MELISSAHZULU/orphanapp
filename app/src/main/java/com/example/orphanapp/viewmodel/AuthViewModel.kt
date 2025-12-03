@@ -29,11 +29,17 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
         viewModelScope.launch {
             repository.authState.collect { firebaseUser ->
                 if (firebaseUser != null) {
+                    // Fetch the user document from Firestore to get custom fields like organizationId
+                    val userDocument = repository.getUserDocument(firebaseUser.uid)
+                    val organizationId = userDocument?.getString("organizationId")
+
+                    // Create the User object using data from both Firebase Auth and Firestore
                     val user = User(
-                        uid = firebaseUser.uid, 
-                        email = firebaseUser.email, 
-                        displayName = firebaseUser.displayName, 
-                        photoUrl = firebaseUser.photoUrl?.toString()
+                        uid = firebaseUser.uid,
+                        email = firebaseUser.email,
+                        displayName = firebaseUser.displayName,
+                        photoUrl = firebaseUser.photoUrl?.toString(),
+                        organizationId = organizationId
                     )
                     _authState.value = AuthState.Authenticated(user)
                 } else {
@@ -87,6 +93,7 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     fun signOut() {
         repository.signOut()
+        _authState.value = AuthState.Unauthenticated
     }
 }
 
